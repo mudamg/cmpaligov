@@ -1,0 +1,4571 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOSMinas — Sistema de Campanha</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    
+<style>
+:root {
+  --cor-primaria: #1a56db;
+  --cor-primaria-hover: #1648b8;
+  --cor-primaria-light: #e8effd;
+  --cor-secundaria: #059669;
+  --cor-secundaria-hover: #047857;
+  --cor-perigo: #dc2626;
+  --cor-perigo-hover: #b91c1c;
+  --cor-aviso: #d97706;
+  --cor-info: #2563eb;
+  --cor-fundo: #f1f5f9;
+  --cor-card: #ffffff;
+  --cor-borda: #e2e8f0;
+  --cor-texto: #1e293b;
+  --cor-texto-secundario: #64748b;
+  --cor-sidebar: #0f172a;
+  --cor-sidebar-hover: #1e293b;
+  --cor-sidebar-ativo: #1a56db;
+  --sombra: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  --sombra-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+  --sombra-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --transicao: all 0.2s ease;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── LOGIN ──────────────────────────────────── */
+#login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1a56db 100%);
+  padding: 20px;
+}
+
+.login-card {
+  background: var(--cor-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--sombra-lg);
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+}
+
+.login-card h1 {
+  font-size: 24px;
+  color: var(--cor-texto);
+  margin-bottom: 8px;
+}
+
+.login-card .subtitulo {
+  color: var(--cor-texto-secundario);
+  font-size: 14px;
+  margin-bottom: 32px;
+}
+
+.login-card .logo-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cor-texto);
+  margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--radius);
+  font-size: 14px;
+  color: var(--cor-texto);
+  background: #fff;
+  transition: var(--transicao);
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 0 3px rgba(26,86,219,0.15);
+}
+
+.form-group input.erro,
+.form-group select.erro {
+  border-color: var(--cor-perigo);
+  box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+}
+
+.form-group .msg-erro {
+  color: var(--cor-perigo);
+  font-size: 12px;
+  margin-top: 4px;
+  display: none;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transicao);
+  text-decoration: none;
+}
+
+.btn-primario {
+  background: var(--cor-primaria);
+  color: #fff;
+}
+.btn-primario:hover { background: var(--cor-primaria-hover); }
+
+.btn-secundario {
+  background: var(--cor-secundaria);
+  color: #fff;
+}
+.btn-secundario:hover { background: var(--cor-secundaria-hover); }
+
+.btn-perigo {
+  background: var(--cor-perigo);
+  color: #fff;
+}
+.btn-perigo:hover { background: var(--cor-perigo-hover); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--cor-primaria);
+  border: 1px solid var(--cor-borda);
+}
+.btn-outline:hover {
+  background: var(--cor-primaria-light);
+  border-color: var(--cor-primaria);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.alerta {
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  margin-bottom: 16px;
+  display: none;
+}
+
+.alerta-erro {
+  background: #fef2f2;
+  color: var(--cor-perigo);
+  border: 1px solid #fecaca;
+}
+
+.alerta-sucesso {
+  background: #f0fdf4;
+  color: var(--cor-secundaria);
+  border: 1px solid #bbf7d0;
+}
+
+/* ── LAYOUT PRINCIPAL ───────────────────────── */
+#app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── SIDEBAR ────────────────────────────────── */
+#sidebar {
+  width: 260px;
+  background: var(--cor-sidebar);
+  color: #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1000;
+  transition: var(--transicao);
+  overflow-y: auto;
+}
+
+#sidebar .sidebar-header {
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+#sidebar .sidebar-header h2 {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+#sidebar .sidebar-header small {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+#sidebar nav {
+  padding: 12px 0;
+  flex: 1;
+}
+
+#sidebar nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 14px;
+  transition: var(--transicao);
+  border-left: 3px solid transparent;
+}
+
+#sidebar nav a:hover {
+  background: var(--cor-sidebar-hover);
+  color: #e2e8f0;
+}
+
+#sidebar nav a.ativo {
+  background: rgba(26,86,219,0.15);
+  color: #fff;
+  border-left-color: var(--cor-sidebar-ativo);
+}
+
+#sidebar nav a i {
+  width: 20px;
+  text-align: center;
+  font-size: 16px;
+}
+
+#sidebar .sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  font-size: 13px;
+}
+
+#sidebar .sidebar-footer .user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+#sidebar .sidebar-footer .user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--cor-primaria);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+#sidebar .sidebar-footer .user-name {
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+#sidebar .sidebar-footer .user-role {
+  color: #64748b;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#sidebar .sidebar-footer .btn-logout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #94a3b8;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 8px 0;
+  transition: var(--transicao);
+  width: 100%;
+}
+
+#sidebar .sidebar-footer .btn-logout:hover {
+  color: var(--cor-perigo);
+}
+
+/* ── CONTEÚDO PRINCIPAL ─────────────────────── */
+#main-content {
+  flex: 1;
+  margin-left: 260px;
+  padding: 24px 32px;
+  min-height: 100vh;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--cor-texto);
+}
+
+.page {
+  display: none;
+}
+
+.page.ativa {
+  display: block;
+}
+
+/* ── CONTADOR DA ELEIÇÃO ────────────────────── */
+.contador-eleicao {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  text-align: center;
+  margin-bottom: 24px;
+  box-shadow: var(--sombra-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.contador-eleicao::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 300px;
+  height: 300px;
+  background: rgba(26,86,219,0.15);
+  border-radius: 50%;
+}
+
+.contador-eleicao .icone-urna {
+  font-size: 40px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.contador-eleicao .dias-numero {
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 8px;
+  position: relative;
+  background: linear-gradient(135deg, #fff, #93c5fd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.contador-eleicao .dias-texto {
+  font-size: 18px;
+  font-weight: 600;
+  position: relative;
+  color: #cbd5e1;
+}
+
+.contador-eleicao .data-eleicao {
+  font-size: 14px;
+  color: #64748b;
+  margin-top: 8px;
+  position: relative;
+}
+
+/* ── CARDS DE RESUMO ────────────────────────── */
+.cards-resumo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.card-resumo {
+  background: var(--cor-card);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--sombra);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: var(--transicao);
+}
+
+.card-resumo:hover {
+  box-shadow: var(--sombra-md);
+  transform: translateY(-1px);
+}
+
+.card-resumo .card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.card-resumo .card-icon.azul { background: #dbeafe; color: var(--cor-primaria); }
+.card-resumo .card-icon.verde { background: #d1fae5; color: var(--cor-secundaria); }
+.card-resumo .card-icon.laranja { background: #fed7aa; color: var(--cor-aviso); }
+.card-resumo .card-icon.vermelho { background: #fecaca; color: var(--cor-perigo); }
+
+.card-resumo .card-info h3 {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.card-resumo .card-info p {
+  font-size: 13px;
+  color: var(--cor-texto-secundario);
+}
+
+/* ── ATALHOS RÁPIDOS ────────────────────────── */
+.atalhos-rapidos {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+/* ── ATIVIDADES RECENTES ────────────────────── */
+.card-secao {
+  background: var(--cor-card);
+  border-radius: var(--radius);
+  box-shadow: var(--sombra);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+
+.card-secao h2 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lista-atividades {
+  list-style: none;
+}
+
+.lista-atividades li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--cor-borda);
+  font-size: 13px;
+}
+
+.lista-atividades li:last-child {
+  border-bottom: none;
+}
+
+.lista-atividades .atividade-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.lista-atividades .atividade-icon.login { background: #dbeafe; color: var(--cor-primaria); }
+.lista-atividades .atividade-icon.criar { background: #d1fae5; color: var(--cor-secundaria); }
+.lista-atividades .atividade-icon.editar { background: #fed7aa; color: var(--cor-aviso); }
+.lista-atividades .atividade-icon.excluir { background: #fecaca; color: var(--cor-perigo); }
+
+.lista-atividades .atividade-texto {
+  flex: 1;
+  color: var(--cor-texto);
+}
+
+.lista-atividades .atividade-texto strong {
+  font-weight: 600;
+}
+
+.lista-atividades .atividade-hora {
+  color: var(--cor-texto-secundario);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* ── LOADING / SPINNER ──────────────────────── */
+.loading-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--cor-borda);
+  border-top-color: var(--cor-primaria);
+  border-radius: 50%;
+  animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+  to { transform: rotate(360deg); }
+}
+
+.loading-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--cor-texto-secundario);
+  font-size: 14px;
+}
+
+.loading-inline .spinner-sm {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--cor-borda);
+  border-top-color: var(--cor-primaria);
+  border-radius: 50%;
+  animation: girar 0.8s linear infinite;
+}
+
+/* ── MODAL ──────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transicao);
+}
+
+.modal-overlay.visivel {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal {
+  background: var(--cor-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--sombra-lg);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: scale(0.95);
+  transition: var(--transicao);
+}
+
+.modal-overlay.visivel .modal {
+  transform: scale(1);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.modal-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.modal-header .btn-fechar {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--cor-texto-secundario);
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: var(--transicao);
+}
+
+.modal-header .btn-fechar:hover {
+  color: var(--cor-perigo);
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--cor-borda);
+}
+
+/* ── TABELA ─────────────────────────────────── */
+.tabela-container {
+  overflow-x: auto;
+  background: var(--cor-card);
+  border-radius: var(--radius);
+  box-shadow: var(--sombra);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table thead th {
+  background: var(--cor-fundo);
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cor-texto-secundario);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--cor-borda);
+  white-space: nowrap;
+}
+
+table tbody td {
+  padding: 12px 16px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+table tbody tr:hover {
+  background: var(--cor-primaria-light);
+}
+
+table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── BADGES ─────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-azul { background: #dbeafe; color: #1d4ed8; }
+.badge-verde { background: #d1fae5; color: #047857; }
+.badge-laranja { background: #fed7aa; color: #b45309; }
+.badge-vermelho { background: #fecaca; color: #b91c1c; }
+.badge-cinza { background: #f1f5f9; color: #475569; }
+
+/* ── PAGINAÇÃO ──────────────────────────────── */
+.paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 16px;
+}
+
+.paginacao button {
+  padding: 8px 12px;
+  border: 1px solid var(--cor-borda);
+  background: #fff;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 13px;
+  transition: var(--transicao);
+}
+
+.paginacao button:hover { background: var(--cor-primaria-light); }
+.paginacao button.ativa { background: var(--cor-primaria); color: #fff; border-color: var(--cor-primaria); }
+.paginacao button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── TOAST / NOTIFICAÇÃO ────────────────────── */
+#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  padding: 14px 20px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  box-shadow: var(--sombra-lg);
+  animation: toast-in 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 380px;
+}
+
+.toast-sucesso { background: #065f46; color: #fff; }
+.toast-erro { background: #991b1b; color: #fff; }
+.toast-info { background: #1e40af; color: #fff; }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(50px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ── SIDEBAR TOGGLE MOBILE ──────────────────── */
+#sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1100;
+  background: var(--cor-sidebar);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* ── RESPONSIVO ─────────────────────────────── */
+@media (max-width: 768px) {
+  #sidebar {
+    transform: translateX(-100%);
+  }
+  #sidebar.aberto {
+    transform: translateX(0);
+  }
+  #main-content {
+    margin-left: 0;
+    padding: 16px;
+    padding-top: 60px;
+  }
+  #sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cards-resumo {
+    grid-template-columns: 1fr 1fr;
+  }
+  .contador-eleicao .dias-numero {
+    font-size: 48px;
+  }
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .modal {
+    width: 95%;
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .cards-resumo {
+    grid-template-columns: 1fr;
+  }
+  .atalhos-rapidos {
+    flex-direction: column;
+  }
+  .atalhos-rapidos .btn {
+    width: 100%;
+  }
+}
+
+/* ── CONTATOS — Formulário responsivo ───────── */
+@media (max-width: 640px) {
+  #modal-contato .modal-body [style*="grid-template-columns"] {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+}
+
+/* Select com busca — estilo consistente */
+.form-group select {
+  appearance: auto;
+  cursor: pointer;
+}
+
+/* ── PLANEJADOR — Kanban ────────────────────── */
+.kanban-container {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 16px;
+  min-height: 400px;
+  align-items: flex-start;
+}
+
+.kanban-coluna {
+  min-width: 280px;
+  max-width: 320px;
+  flex-shrink: 0;
+  background: var(--cor-fundo);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 200px);
+}
+
+.kanban-coluna-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  cursor: grab;
+}
+
+.kanban-coluna-header h3 {
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kanban-coluna-header .badge-count {
+  background: rgba(255,255,255,0.3);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.kanban-coluna-header .acoes-quadro {
+  display: flex;
+  gap: 4px;
+}
+
+.kanban-coluna-header .acoes-quadro button {
+  background: none;
+  border: none;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 12px;
+  transition: var(--transicao);
+}
+
+.kanban-coluna-header .acoes-quadro button:hover {
+  opacity: 1;
+}
+
+.kanban-coluna-body {
+  padding: 8px 12px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 60px;
+}
+
+.kanban-coluna-body.drag-over {
+  background: rgba(26,86,219,0.05);
+  border: 2px dashed var(--cor-primaria);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.kanban-card {
+  background: var(--cor-card);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  box-shadow: var(--sombra);
+  cursor: pointer;
+  transition: var(--transicao);
+  border-left: 3px solid transparent;
+}
+
+.kanban-card:hover {
+  box-shadow: var(--sombra-md);
+  transform: translateY(-1px);
+}
+
+.kanban-card.dragging {
+  opacity: 0.5;
+  transform: rotate(2deg);
+}
+
+.kanban-card .card-titulo {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  word-break: break-word;
+}
+
+.kanban-card .card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: var(--cor-texto-secundario);
+}
+
+.kanban-card .card-meta .badge {
+  font-size: 10px;
+  padding: 2px 6px;
+}
+
+.kanban-card.prioridade-urgente { border-left-color: var(--cor-perigo); }
+.kanban-card.prioridade-alta { border-left-color: var(--cor-aviso); }
+.kanban-card.prioridade-media { border-left-color: var(--cor-primaria); }
+.kanban-card.prioridade-baixa { border-left-color: var(--cor-secundaria); }
+
+.kanban-add-card {
+  background: none;
+  border: 2px dashed var(--cor-borda);
+  border-radius: var(--radius);
+  padding: 10px;
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+  cursor: pointer;
+  transition: var(--transicao);
+  width: 100%;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.kanban-add-card:hover {
+  border-color: var(--cor-primaria);
+  color: var(--cor-primaria);
+  background: var(--cor-primaria-light);
+}
+
+.kanban-add-coluna {
+  min-width: 280px;
+  background: var(--cor-fundo);
+  border: 2px dashed var(--cor-borda);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  cursor: pointer;
+  color: var(--cor-texto-secundario);
+  font-size: 14px;
+  transition: var(--transicao);
+  flex-shrink: 0;
+  min-height: 100px;
+}
+
+.kanban-add-coluna:hover {
+  border-color: var(--cor-primaria);
+  color: var(--cor-primaria);
+  background: var(--cor-primaria-light);
+}
+
+.kanban-filtros {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.kanban-filtros select, .kanban-filtros input {
+  padding: 7px 12px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--radius);
+  font-size: 13px;
+  background: #fff;
+}
+
+/* Checklist dentro da tarefa */
+.checklist-container {
+  margin-top: 12px;
+}
+
+.checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 13px;
+}
+
+.checklist-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.checklist-item.feito span {
+  text-decoration: line-through;
+  color: var(--cor-texto-secundario);
+}
+
+.checklist-input-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.checklist-input-row input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--radius);
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .kanban-container {
+    flex-direction: column;
+  }
+  .kanban-coluna {
+    min-width: 100%;
+    max-width: 100%;
+    max-height: none;
+  }
+}
+
+/* ── AGENDA — Calendário ────────────────────── */
+.agenda-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.agenda-toolbar .nav-mes {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.agenda-toolbar .nav-mes h2 {
+  font-size: 20px;
+  font-weight: 700;
+  min-width: 200px;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.agenda-toolbar .nav-mes button {
+  background: var(--cor-card);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--radius);
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transicao);
+}
+
+.agenda-toolbar .nav-mes button:hover {
+  background: var(--cor-primaria-light);
+  border-color: var(--cor-primaria);
+}
+
+.agenda-filtros {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.agenda-filtros select {
+  padding: 7px 12px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--radius);
+  font-size: 13px;
+  background: #fff;
+}
+
+.calendario-grid {
+  background: var(--cor-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+}
+
+.calendario-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: var(--cor-fundo);
+  border-bottom: 2px solid var(--cor-borda);
+}
+
+.calendario-header div {
+  padding: 12px 8px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cor-texto-secundario);
+  text-transform: uppercase;
+}
+
+.calendario-body {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.calendario-dia {
+  min-height: 100px;
+  border-right: 1px solid var(--cor-borda);
+  border-bottom: 1px solid var(--cor-borda);
+  padding: 4px;
+  position: relative;
+  cursor: pointer;
+  transition: var(--transicao);
+}
+
+.calendario-dia:nth-child(7n) {
+  border-right: none;
+}
+
+.calendario-dia:hover {
+  background: var(--cor-primaria-light);
+}
+
+.calendario-dia.outro-mes {
+  background: #f8fafc;
+  color: #cbd5e1;
+}
+
+.calendario-dia.hoje {
+  background: #eff6ff;
+}
+
+.calendario-dia .dia-numero {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 6px;
+  display: inline-block;
+}
+
+.calendario-dia.hoje .dia-numero {
+  background: var(--cor-primaria);
+  color: #fff;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.evento-chip {
+  display: block;
+  padding: 2px 6px;
+  margin: 1px 2px;
+  border-radius: 3px;
+  font-size: 11px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: var(--transicao);
+}
+
+.evento-chip:hover {
+  opacity: 0.85;
+  transform: scale(1.02);
+}
+
+.evento-chip.comicio { background: #dc2626; }
+.evento-chip.reuniao { background: #2563eb; }
+.evento-chip.visita { background: #059669; }
+.evento-chip.entrevista { background: #7c3aed; }
+.evento-chip.outro { background: #64748b; }
+
+.evento-chip-mais {
+  font-size: 10px;
+  color: var(--cor-texto-secundario);
+  padding: 2px 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Vista lista da agenda */
+.agenda-lista-container {
+  display: none;
+}
+
+.agenda-lista-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--cor-card);
+  border-radius: var(--radius);
+  box-shadow: var(--sombra);
+  margin-bottom: 8px;
+  transition: var(--transicao);
+  border-left: 4px solid #64748b;
+}
+
+.agenda-lista-item:hover {
+  box-shadow: var(--sombra-md);
+}
+
+.agenda-lista-item.comicio { border-left-color: #dc2626; }
+.agenda-lista-item.reuniao { border-left-color: #2563eb; }
+.agenda-lista-item.visita { border-left-color: #059669; }
+.agenda-lista-item.entrevista { border-left-color: #7c3aed; }
+
+.agenda-lista-item .evento-data-col {
+  text-align: center;
+  min-width: 60px;
+}
+
+.agenda-lista-item .evento-data-col .dia {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--cor-texto);
+  line-height: 1;
+}
+
+.agenda-lista-item .evento-data-col .mes-ano {
+  font-size: 11px;
+  color: var(--cor-texto-secundario);
+  text-transform: uppercase;
+}
+
+.agenda-lista-item .evento-info {
+  flex: 1;
+}
+
+.agenda-lista-item .evento-info h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.agenda-lista-item .evento-info .evento-detalhe {
+  font-size: 13px;
+  color: var(--cor-texto-secundario);
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.agenda-lista-item .evento-acoes {
+  display: flex;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+@media (max-width: 768px) {
+  .calendario-dia {
+    min-height: 60px;
+  }
+  .calendario-dia .dia-numero {
+    font-size: 11px;
+  }
+  .evento-chip {
+    font-size: 9px;
+    padding: 1px 4px;
+  }
+  .agenda-toolbar .nav-mes h2 {
+    font-size: 16px;
+    min-width: 160px;
+  }
+}
+</style>
+
+</head>
+<body>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- Loading Global -->
+    <div id="loading-global" class="loading-overlay" style="display:none;">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Toggle Sidebar Mobile -->
+    <button id="sidebar-toggle"><i class="fas fa-bars"></i></button>
+
+    <!-- Página de Login -->
+    
+    <div id="login-page">
+        <div class="login-card">
+            <span class="logo-icon">🗳️</span>
+            <h1>SOSMinas</h1>
+            <p class="subtitulo">Sistema de Gestão de Campanha</p>
+
+            <div id="login-alerta" class="alerta alerta-erro"></div>
+
+            <div class="form-group">
+                <label for="login-email">E-mail</label>
+                <input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email">
+            </div>
+
+            <div class="form-group">
+                <label for="login-senha">Senha</label>
+                <input type="password" id="login-senha" placeholder="Sua senha" autocomplete="current-password">
+            </div>
+
+            <button id="btn-entrar" class="btn btn-primario btn-block" onclick="fazerLogin()">
+                <i class="fas fa-sign-in-alt"></i> Entrar
+            </button>
+
+            <p style="margin-top:24px;font-size:12px;color:var(--cor-texto-secundario);">
+                v1.0.0 &bull; Acesso restrito à equipe de campanha
+            </p>
+        </div>
+    </div>
+
+
+    <!-- App Principal -->
+    <div id="app-container" style="display:none;">
+
+        <!-- Sidebar -->
+        
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <h2>🗳️ SOSMinas</h2>
+                <small>Gestão de Campanha</small>
+            </div>
+
+            <nav>
+                <a href="#painel" data-pagina="painel" class="ativo">
+                    <i class="fas fa-home"></i> Painel Principal
+                </a>
+                <a href="#contatos" data-pagina="contatos">
+                    <i class="fas fa-users"></i> Contatos
+                </a>
+                <a href="#planejador" data-pagina="planejador">
+                    <i class="fas fa-tasks"></i> Planejador
+                </a>
+                <a href="#agenda" data-pagina="agenda">
+                    <i class="fas fa-calendar-alt"></i> Agenda
+                </a>
+                <a href="#dashboards" data-pagina="dashboards">
+                    <i class="fas fa-chart-bar"></i> Dashboards
+                </a>
+                <a href="#admin" data-pagina="admin" id="nav-admin" style="display:none;">
+                    <i class="fas fa-cog"></i> Administração
+                </a>
+                <a href="#perfil" data-pagina="perfil">
+                    <i class="fas fa-user-circle"></i> Meu Perfil
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="user-avatar">?</div>
+                    <div>
+                        <div class="user-name" id="user-name">Usuário</div>
+                        <div class="user-role" id="user-role">-</div>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="fazerLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Sair do sistema
+                </button>
+            </div>
+        </aside>
+
+
+        <!-- Conteúdo -->
+        <div id="main-content">
+            
+            <div id="page-painel" class="page ativa">
+                <!-- Contador da Eleição -->
+                <div class="contador-eleicao">
+                    <div class="icone-urna">🗳️</div>
+                    <div class="dias-numero" id="contador-dias">---</div>
+                    <div class="dias-texto" id="contador-texto">DIAS PARA A ELEIÇÃO</div>
+                    <div class="data-eleicao" id="contador-data">Carregando...</div>
+                </div>
+
+                <!-- Cards de Resumo -->
+                <div class="cards-resumo">
+                    <div class="card-resumo">
+                        <div class="card-icon azul"><i class="fas fa-users"></i></div>
+                        <div class="card-info">
+                            <h3 id="kpi-contatos">-</h3>
+                            <p>Total de Contatos</p>
+                        </div>
+                    </div>
+                    <div class="card-resumo">
+                        <div class="card-icon laranja"><i class="fas fa-tasks"></i></div>
+                        <div class="card-info">
+                            <h3 id="kpi-tarefas">-</h3>
+                            <p>Tarefas Pendentes</p>
+                        </div>
+                    </div>
+                    <div class="card-resumo">
+                        <div class="card-icon vermelho"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="card-info">
+                            <h3 id="kpi-atrasadas">-</h3>
+                            <p>Tarefas Atrasadas</p>
+                        </div>
+                    </div>
+                    <div class="card-resumo">
+                        <div class="card-icon verde"><i class="fas fa-calendar-check"></i></div>
+                        <div class="card-info">
+                            <h3 id="kpi-eventos">-</h3>
+                            <p>Eventos Próximos</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Atalhos Rápidos -->
+                <div class="atalhos-rapidos">
+                    <button class="btn btn-primario" onclick="navegar('contatos')">
+                        <i class="fas fa-user-plus"></i> Novo Contato
+                    </button>
+                    <button class="btn btn-secundario" onclick="navegar('planejador')">
+                        <i class="fas fa-plus-circle"></i> Nova Tarefa
+                    </button>
+                    <button class="btn btn-outline" onclick="navegar('agenda')">
+                        <i class="fas fa-calendar-plus"></i> Novo Evento
+                    </button>
+                    <button class="btn btn-outline" onclick="carregarPainel()">
+                        <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                </div>
+
+                <!-- Atividades Recentes -->
+                <div class="card-secao">
+                    <h2><i class="fas fa-history"></i> Atividades Recentes</h2>
+                    <ul class="lista-atividades" id="lista-atividades">
+                        <li style="color:var(--cor-texto-secundario);text-align:center;padding:20px;">
+                            Carregando...
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            
+            <div id="page-contatos" class="page">
+                <div class="page-header">
+                    <h1><i class="fas fa-users"></i> Contatos</h1>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <span id="contatos-total" style="align-self:center;font-size:13px;color:var(--cor-texto-secundario);"></span>
+                        
+                        <button class="btn btn-outline" onclick="exportarContatosCSV()" title="Exportar CSV"><i class="fas fa-download"></i> Exportar</button>
+                        
+                        <button class="btn btn-primario" onclick="abrirModalContato()" id="btn-novo-contato"><i class="fas fa-user-plus"></i> Novo Contato</button>
+                    </div>
+                </div>
+
+                <!-- Filtros -->
+                <div class="card-secao" style="margin-bottom:16px;">
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+                        <div style="flex:2;min-width:200px;">
+                            <label style="font-size:12px;font-weight:600;color:var(--cor-texto-secundario);display:block;margin-bottom:4px;">Buscar</label>
+                            <input type="text" id="contatos-busca" placeholder="Nome ou WhatsApp..." style="width:100%;padding:8px 12px;border:1px solid var(--cor-borda);border-radius:var(--radius);font-size:14px;" onkeypress="if(event.key==='Enter')aplicarFiltrosContatos()">
+                        </div>
+                        <div style="flex:1;min-width:140px;">
+                            <label style="font-size:12px;font-weight:600;color:var(--cor-texto-secundario);display:block;margin-bottom:4px;">Categoria</label>
+                            <select id="contatos-filtro-categoria" style="width:100%;padding:8px 12px;border:1px solid var(--cor-borda);border-radius:var(--radius);font-size:14px;">
+                                <option value="">Todas</option>
+                                <option value="eleitor">Eleitor</option>
+                                <option value="lideranca">Liderança</option>
+                                <option value="apoiador">Apoiador</option>
+                                <option value="voluntario">Voluntário</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
+                        <div style="flex:1;min-width:140px;">
+                            <label style="font-size:12px;font-weight:600;color:var(--cor-texto-secundario);display:block;margin-bottom:4px;">Estado</label>
+                            <select id="contatos-filtro-estado" style="width:100%;padding:8px 12px;border:1px solid var(--cor-borda);border-radius:var(--radius);font-size:14px;" onchange="onFiltroEstadoChange()">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+                        <div style="flex:1;min-width:140px;">
+                            <label style="font-size:12px;font-weight:600;color:var(--cor-texto-secundario);display:block;margin-bottom:4px;">Município</label>
+                            <select id="contatos-filtro-municipio" style="width:100%;padding:8px 12px;border:1px solid var(--cor-borda);border-radius:var(--radius);font-size:14px;" disabled>
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn btn-primario" onclick="aplicarFiltrosContatos()" style="padding:8px 16px;"><i class="fas fa-search"></i> Filtrar</button>
+                            <button class="btn btn-outline" onclick="limparFiltrosContatos()" style="padding:8px 16px;"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabela -->
+                <div class="tabela-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Categoria</th>
+                                <th>WhatsApp</th>
+                                <th>Município</th>
+                                <th>UF</th>
+                                <th>Cadastro</th>
+                                <th style="width:130px;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="contatos-tabela-body">
+                            <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--cor-texto-secundario);">Carregando...</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="paginacao" id="contatos-paginacao"></div>
+                </div>
+            </div>
+
+            <!-- Modal: Novo / Editar Contato -->
+            <div id="modal-contato" class="modal-overlay" onclick="if(event.target===this)fecharModalContato()">
+                <div class="modal" style="max-width:680px;">
+                    <div class="modal-header">
+                        <h2 id="modal-contato-titulo">Novo Contato</h2>
+                        <button class="btn-fechar" onclick="fecharModalContato()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="form-contato" onsubmit="event.preventDefault();salvarContato();">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                                <div class="form-group" style="grid-column:1/3;">
+                                    <label>Nome completo *</label>
+                                    <input type="text" id="form-contato-nome" placeholder="Nome completo" required minlength="3">
+                                </div>
+                                <div class="form-group">
+                                    <label>Categoria *</label>
+                                    <select id="form-contato-categoria" required>
+                                        <option value="">Selecione...</option>
+                                        <option value="eleitor">Eleitor</option>
+                                        <option value="lideranca">Liderança</option>
+                                        <option value="apoiador">Apoiador</option>
+                                        <option value="voluntario">Voluntário</option>
+                                        <option value="outro">Outro</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>WhatsApp * <small style="color:var(--cor-texto-secundario);">(só números)</small></label>
+                                    <input type="text" id="form-contato-whatsapp" placeholder="62999990000" inputmode="numeric" maxlength="11">
+                                </div>
+                                <div class="form-group">
+                                    <label>CPF <small style="color:var(--cor-texto-secundario);">(opcional, só números)</small></label>
+                                    <input type="text" id="form-contato-cpf" placeholder="12345678900" inputmode="numeric" maxlength="11">
+                                </div>
+                                <div class="form-group">
+                                    <label>E-mail</label>
+                                    <input type="email" id="form-contato-email" placeholder="email@exemplo.com">
+                                </div>
+                                <div class="form-group">
+                                    <label>Data de Nascimento</label>
+                                    <input type="date" id="form-contato-nascimento">
+                                </div>
+                                <div class="form-group">
+                                    <label>CEP <small style="color:var(--cor-texto-secundario);">(opcional)</small></label>
+                                    <input type="text" id="form-contato-cep" placeholder="74000000" inputmode="numeric" maxlength="8">
+                                </div>
+                                <div class="form-group">
+                                    <label>Estado *</label>
+                                    <select id="form-contato-estado" required onchange="onFormEstadoChange()">
+                                        <option value="">Selecione...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Município *</label>
+                                    <select id="form-contato-municipio" required disabled>
+                                        <option value="">Selecione um estado primeiro</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="grid-column:1/3;">
+                                    <label>Observações <small style="color:var(--cor-texto-secundario);">(máx. 500 caracteres)</small></label>
+                                    <textarea id="form-contato-observacoes" rows="3" maxlength="500" placeholder="Observações sobre o contato..."></textarea>
+                                </div>
+                                <div class="form-group" style="grid-column:1/3;">
+                                    <label>Foto</label>
+                                    <div id="form-contato-foto-preview" style="display:none;margin-bottom:8px;"></div>
+                                    <input type="file" id="form-contato-foto" accept="image/jpeg,image/png,image/gif,image/webp" style="font-size:13px;">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline" onclick="fecharModalContato()">Cancelar</button>
+                        <button class="btn btn-primario" onclick="salvarContato()"><i class="fas fa-save"></i> Salvar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal: Visualizar Contato -->
+            <div id="modal-visualizar-contato" class="modal-overlay" onclick="if(event.target===this)fecharModalVisualizarContato()">
+                <div class="modal" style="max-width:550px;">
+                    <div class="modal-header">
+                        <h2>Detalhes do Contato</h2>
+                        <button class="btn-fechar" onclick="fecharModalVisualizarContato()">&times;</button>
+                    </div>
+                    <div class="modal-body" id="modal-visualizar-conteudo">
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline" onclick="fecharModalVisualizarContato()">Fechar</button>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div id="page-planejador" class="page">
+                <div class="page-header">
+                    <h1><i class="fas fa-tasks"></i> Planejador</h1>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-outline" onclick="carregarPlanejador()"><i class="fas fa-sync-alt"></i> Atualizar</button>
+                    </div>
+                </div>
+
+                <!-- Filtros -->
+                <div class="kanban-filtros">
+                    <select id="plan-filtro-responsavel" onchange="aplicarFiltrosPlanejador()">
+                        <option value="">Todos os responsáveis</option>
+                    </select>
+                    <select id="plan-filtro-prioridade" onchange="aplicarFiltrosPlanejador()">
+                        <option value="">Todas as prioridades</option>
+                        <option value="urgente">Urgente</option>
+                        <option value="alta">Alta</option>
+                        <option value="media">Média</option>
+                        <option value="baixa">Baixa</option>
+                    </select>
+                    <select id="plan-filtro-status" onchange="aplicarFiltrosPlanejador()">
+                        <option value="">Todos os status</option>
+                        <option value="pendente">Pendente</option>
+                        <option value="em_andamento">Em andamento</option>
+                        <option value="concluida">Concluída</option>
+                        <option value="cancelada">Cancelada</option>
+                    </select>
+                    <button class="btn btn-outline" onclick="limparFiltrosPlanejador()" style="padding:7px 12px;font-size:13px;"><i class="fas fa-times"></i> Limpar</button>
+                </div>
+
+                <!-- Kanban Board -->
+                <div class="kanban-container" id="kanban-container">
+                    <div style="text-align:center;padding:40px;width:100%;color:var(--cor-texto-secundario);">Carregando...</div>
+                </div>
+            </div>
+
+            <!-- Modal: Quadro -->
+            <div id="modal-quadro" class="modal-overlay" onclick="if(event.target===this)fecharModalQuadro()">
+                <div class="modal" style="max-width:450px;">
+                    <div class="modal-header">
+                        <h2 id="modal-quadro-titulo">Novo Quadro</h2>
+                        <button class="btn-fechar" onclick="fecharModalQuadro()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="form-quadro" onsubmit="event.preventDefault();salvarQuadro();">
+                            <input type="hidden" id="form-quadro-id">
+                            <div class="form-group">
+                                <label>Nome do quadro *</label>
+                                <input type="text" id="form-quadro-nome" placeholder="Ex: A Fazer, Em Progresso..." required>
+                            </div>
+                            <div class="form-group">
+                                <label>Descrição</label>
+                                <textarea id="form-quadro-descricao" rows="2" placeholder="Descrição do quadro..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Cor</label>
+                                <input type="color" id="form-quadro-cor" value="#3498db" style="width:60px;height:36px;padding:2px;cursor:pointer;">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline" onclick="fecharModalQuadro()">Cancelar</button>
+                        <button class="btn btn-primario" onclick="salvarQuadro()"><i class="fas fa-save"></i> Salvar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal: Tarefa -->
+            <div id="modal-tarefa" class="modal-overlay" onclick="if(event.target===this)fecharModalTarefa()">
+                <div class="modal" style="max-width:620px;">
+                    <div class="modal-header">
+                        <h2 id="modal-tarefa-titulo">Nova Tarefa</h2>
+                        <button class="btn-fechar" onclick="fecharModalTarefa()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="form-tarefa" onsubmit="event.preventDefault();salvarTarefa();">
+                            <input type="hidden" id="form-tarefa-id">
+                            <input type="hidden" id="form-tarefa-quadro-id">
+                            <div class="form-group">
+                                <label>Título *</label>
+                                <input type="text" id="form-tarefa-titulo-input" placeholder="Título da tarefa" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Descrição</label>
+                                <textarea id="form-tarefa-descricao" rows="3" placeholder="Detalhes da tarefa..."></textarea>
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                                <div class="form-group">
+                                    <label>Quadro *</label>
+                                    <select id="form-tarefa-quadro" required></select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Responsável</label>
+                                    <select id="form-tarefa-responsavel">
+                                        <option value="">Sem responsável</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Prioridade</label>
+                                    <select id="form-tarefa-prioridade">
+                                        <option value="baixa">Baixa</option>
+                                        <option value="media" selected>Média</option>
+                                        <option value="alta">Alta</option>
+                                        <option value="urgente">Urgente</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Status</label>
+                                    <select id="form-tarefa-status">
+                                        <option value="pendente">Pendente</option>
+                                        <option value="em_andamento">Em andamento</option>
+                                        <option value="concluida">Concluída</option>
+                                        <option value="cancelada">Cancelada</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Data início</label>
+                                    <input type="date" id="form-tarefa-data-inicio">
+                                </div>
+                                <div class="form-group">
+                                    <label>Prazo</label>
+                                    <input type="date" id="form-tarefa-data-prazo">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Checklist</label>
+                                <div class="checklist-container" id="checklist-container"></div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-perigo" id="btn-excluir-tarefa" onclick="excluirTarefaConfirmar()" style="display:none;margin-right:auto;"><i class="fas fa-trash"></i> Excluir</button>
+                        <button class="btn btn-outline" onclick="fecharModalTarefa()">Cancelar</button>
+                        <button class="btn btn-primario" onclick="salvarTarefa()"><i class="fas fa-save"></i> Salvar</button>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div id="page-agenda" class="page">
+                <div class="page-header">
+                    <h1><i class="fas fa-calendar-alt"></i> Agenda</h1>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-outline" id="btn-vista-calendario" onclick="alternarVistaAgenda('calendario')"><i class="fas fa-calendar"></i></button>
+                        <button class="btn btn-outline" id="btn-vista-lista" onclick="alternarVistaAgenda('lista')"><i class="fas fa-list"></i></button>
+                        <button class="btn btn-primario" onclick="abrirModalEvento()" id="btn-novo-evento"><i class="fas fa-calendar-plus"></i> Novo Evento</button>
+                    </div>
+                </div>
+
+                <!-- Toolbar de navegação -->
+                <div class="agenda-toolbar">
+                    <div class="nav-mes">
+                        <button onclick="mesAnterior()"><i class="fas fa-chevron-left"></i></button>
+                        <h2 id="agenda-mes-titulo">Carregando...</h2>
+                        <button onclick="mesSeguinte()"><i class="fas fa-chevron-right"></i></button>
+                        <button class="btn btn-outline" onclick="irParaHoje()" style="padding:6px 12px;font-size:12px;">Hoje</button>
+                    </div>
+                    <div class="agenda-filtros">
+                        <select id="agenda-filtro-tipo" onchange="aplicarFiltrosAgenda()">
+                            <option value="">Todos os tipos</option>
+                            <option value="comicio">Comício</option>
+                            <option value="reuniao">Reunião</option>
+                            <option value="visita">Visita</option>
+                            <option value="entrevista">Entrevista</option>
+                            <option value="outro">Outro</option>
+                        </select>
+                        <select id="agenda-filtro-status" onchange="aplicarFiltrosAgenda()">
+                            <option value="">Todos os status</option>
+                            <option value="confirmado">Confirmado</option>
+                            <option value="pendente">Pendente</option>
+                            <option value="cancelado">Cancelado</option>
+                        </select>
+                        <button class="btn btn-outline" onclick="carregarAgenda()" style="padding:7px 12px;font-size:13px;"><i class="fas fa-sync-alt"></i></button>
+                    </div>
+                </div>
+
+                <!-- Vista Calendário -->
+                <div id="calendario-container">
+                    <div class="calendario-grid">
+                        <div class="calendario-header">
+                            <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+                        </div>
+                        <div class="calendario-body" id="calendario-body">
+                        </div>
+                    </div>
+
+                    <!-- Legenda -->
+                    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:var(--cor-texto-secundario);">
+                        <span><span class="evento-chip comicio" style="display:inline-block;width:12px;height:12px;border-radius:2px;vertical-align:middle;"></span> Comício</span>
+                        <span><span class="evento-chip reuniao" style="display:inline-block;width:12px;height:12px;border-radius:2px;vertical-align:middle;"></span> Reunião</span>
+                        <span><span class="evento-chip visita" style="display:inline-block;width:12px;height:12px;border-radius:2px;vertical-align:middle;"></span> Visita</span>
+                        <span><span class="evento-chip entrevista" style="display:inline-block;width:12px;height:12px;border-radius:2px;vertical-align:middle;"></span> Entrevista</span>
+                        <span><span class="evento-chip outro" style="display:inline-block;width:12px;height:12px;border-radius:2px;vertical-align:middle;"></span> Outro</span>
+                    </div>
+                </div>
+
+                <!-- Vista Lista -->
+                <div id="agenda-lista-container" class="agenda-lista-container">
+                    <div id="agenda-lista-conteudo"></div>
+                </div>
+            </div>
+
+            <!-- Modal: Evento -->
+            <div id="modal-evento" class="modal-overlay" onclick="if(event.target===this)fecharModalEvento()">
+                <div class="modal" style="max-width:620px;">
+                    <div class="modal-header">
+                        <h2 id="modal-evento-titulo">Novo Evento</h2>
+                        <button class="btn-fechar" onclick="fecharModalEvento()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="form-evento" onsubmit="event.preventDefault();salvarEvento();">
+                            <input type="hidden" id="form-evento-id">
+                            <div class="form-group">
+                                <label>Título do evento *</label>
+                                <input type="text" id="form-evento-titulo-input" placeholder="Nome do evento" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Descrição</label>
+                                <textarea id="form-evento-descricao" rows="2" placeholder="Detalhes do evento..."></textarea>
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+                                <div class="form-group">
+                                    <label>Data *</label>
+                                    <input type="date" id="form-evento-data" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Hora início</label>
+                                    <input type="time" id="form-evento-hora-inicio">
+                                </div>
+                                <div class="form-group">
+                                    <label>Hora término</label>
+                                    <input type="time" id="form-evento-hora-fim">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Local / Endereço</label>
+                                <input type="text" id="form-evento-local" placeholder="Endereço ou nome do local">
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                                <div class="form-group">
+                                    <label>Estado</label>
+                                    <select id="form-evento-estado" onchange="onFormEventoEstadoChange()">
+                                        <option value="">Selecione...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Município</label>
+                                    <select id="form-evento-municipio" disabled>
+                                        <option value="">Selecione um estado primeiro</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Tipo</label>
+                                    <select id="form-evento-tipo">
+                                        <option value="comicio">Comício</option>
+                                        <option value="reuniao">Reunião</option>
+                                        <option value="visita">Visita</option>
+                                        <option value="entrevista">Entrevista</option>
+                                        <option value="outro" selected>Outro</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Status</label>
+                                    <select id="form-evento-status">
+                                        <option value="pendente" selected>Pendente</option>
+                                        <option value="confirmado">Confirmado</option>
+                                        <option value="cancelado">Cancelado</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-perigo" id="btn-excluir-evento" onclick="excluirEventoConfirmar(document.getElementById('form-evento-id').value, document.getElementById('form-evento-titulo-input').value)" style="display:none;margin-right:auto;"><i class="fas fa-trash"></i> Excluir</button>
+                        <button class="btn btn-outline" onclick="fecharModalEvento()">Cancelar</button>
+                        <button class="btn btn-primario" onclick="salvarEvento()"><i class="fas fa-save"></i> Salvar</button>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div id="page-dashboards" class="page">
+                <div class="page-header">
+                    <h1><i class="fas fa-chart-bar"></i> Dashboards</h1>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-primario" id="dash-tab-contatos" onclick="trocarAbaDash('contatos')"><i class="fas fa-users"></i> Contatos</button>
+                        <button class="btn btn-outline" id="dash-tab-planejador" onclick="trocarAbaDash('planejador')"><i class="fas fa-tasks"></i> Planejador</button>
+                    </div>
+                </div>
+
+                <!-- ══ DASHBOARD CONTATOS ══ -->
+                <div id="dash-painel-contatos">
+                    <div id="dash-contatos-loading" class="loading-inline" style="display:none;justify-content:center;padding:40px;"><span class="spinner-sm"></span> Carregando dados...</div>
+
+                    <!-- KPIs -->
+                    <div class="cards-resumo" style="margin-bottom:20px;">
+                        <div class="card-resumo">
+                            <div class="card-icon azul"><i class="fas fa-users"></i></div>
+                            <div class="card-info">
+                                <h3 id="dash-kpi-total">-</h3>
+                                <p>Total de Contatos</p>
+                            </div>
+                        </div>
+                        <div class="card-resumo">
+                            <div class="card-icon verde"><i class="fas fa-calendar"></i></div>
+                            <div class="card-info">
+                                <h3 id="dash-kpi-mes">-</h3>
+                                <p>Cadastros este Mês</p>
+                            </div>
+                        </div>
+                        <div class="card-resumo">
+                            <div class="card-icon laranja"><i class="fas fa-clock"></i></div>
+                            <div class="card-info">
+                                <h3 id="dash-kpi-semana">-</h3>
+                                <p>Cadastros esta Semana</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráficos: Linha 1 -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                        <div class="card-secao"><div id="grafico-categoria" style="height:320px;"></div></div>
+                        <div class="card-secao"><div id="grafico-estado" style="height:320px;"></div></div>
+                    </div>
+
+                    <!-- Gráficos: Linha 2 -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                        <div class="card-secao"><div id="grafico-municipio" style="height:420px;"></div></div>
+                        <div class="card-secao"><div id="grafico-evolucao" style="height:420px;"></div></div>
+                    </div>
+
+                    <!-- Gráficos: Linha 3 -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                        <div class="card-secao"><div id="grafico-faixa-etaria" style="height:320px;"></div></div>
+                        <div class="card-secao"><div id="grafico-preenchimento" style="height:320px;"></div></div>
+                    </div>
+
+                    <!-- Gráfico: Top 10 Operadores -->
+                    <div class="card-secao" style="margin-bottom:16px;">
+                        <div id="grafico-operadores" style="height:360px;"></div>
+                    </div>
+                </div>
+
+                <!-- ══ DASHBOARD PLANEJADOR ══ -->
+                <div id="dash-painel-planejador" style="display:none;">
+                    <div id="dash-planejador-loading" class="loading-inline" style="display:none;justify-content:center;padding:40px;"><span class="spinner-sm"></span> Carregando dados...</div>
+
+                    <!-- KPIs -->
+                    <div class="cards-resumo" style="margin-bottom:20px;">
+                        <div class="card-resumo">
+                            <div class="card-icon azul"><i class="fas fa-tasks"></i></div>
+                            <div class="card-info">
+                                <h3 id="dash-kpi-tarefas-total">-</h3>
+                                <p>Total de Tarefas</p>
+                            </div>
+                        </div>
+                        <div class="card-resumo">
+                            <div class="card-icon vermelho"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div class="card-info">
+                                <h3 id="dash-kpi-atrasadas">-</h3>
+                                <p>Tarefas Atrasadas</p>
+                            </div>
+                        </div>
+                        <div class="card-resumo">
+                            <div class="card-icon verde"><i class="fas fa-hourglass-half"></i></div>
+                            <div class="card-info">
+                                <h3 id="dash-kpi-prazo-medio">-</h3>
+                                <p>Prazo Médio Conclusão</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráficos: Linha 1 -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                        <div class="card-secao"><div id="grafico-tarefas-status" style="height:320px;"></div></div>
+                        <div class="card-secao"><div id="grafico-tarefas-prioridade" style="height:320px;"></div></div>
+                    </div>
+
+                    <!-- Gráficos: Linha 2 -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                        <div class="card-secao"><div id="grafico-tarefas-quadro" style="height:360px;"></div></div>
+                        <div class="card-secao"><div id="grafico-carga-responsavel" style="height:360px;"></div></div>
+                    </div>
+
+                    <!-- Gráfico: Evolução de conclusões -->
+                    <div class="card-secao" style="margin-bottom:16px;">
+                        <div id="grafico-evolucao-conclusoes" style="height:320px;"></div>
+                    </div>
+
+                    <!-- Lista de atrasadas -->
+                    <div class="card-secao">
+                        <h2 style="margin-bottom:12px;"><i class="fas fa-exclamation-triangle" style="color:var(--cor-perigo);"></i> Tarefas Atrasadas</h2>
+                        <div id="dash-lista-atrasadas" class="tabela-container" style="box-shadow:none;">
+                            <p style="text-align:center;color:var(--cor-texto-secundario);padding:20px;">Carregando...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div id="page-admin" class="page">
+                <div class="page-header">
+                    <h1><i class="fas fa-cog"></i> Administração</h1>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-primario" id="admin-tab-usuarios" onclick="trocarAbaAdmin('usuarios')"><i class="fas fa-users-cog"></i> Usuários</button>
+                        <button class="btn btn-outline" id="admin-tab-logs" onclick="trocarAbaAdmin('logs')"><i class="fas fa-history"></i> Logs</button>
+                        <button class="btn btn-outline" id="admin-tab-configs" onclick="trocarAbaAdmin('configs')"><i class="fas fa-sliders-h"></i> Configurações</button>
+                    </div>
+                </div>
+
+                <!-- ══ ABA: USUÁRIOS ══ -->
+                <div id="admin-painel-usuarios">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                        <h2 style="font-size:16px;font-weight:700;"><i class="fas fa-users-cog"></i> Gestão de Usuários</h2>
+                        <button class="btn btn-primario" onclick="abrirModalUsuario()"><i class="fas fa-user-plus"></i> Novo Usuário</button>
+                    </div>
+                    <div class="tabela-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>E-mail</th>
+                                    <th>Nível</th>
+                                    <th>Status</th>
+                                    <th>Criado em</th>
+                                    <th style="width:130px;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-usuarios-body">
+                                <tr><td colspan="6" style="text-align:center;padding:30px;">Carregando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ══ ABA: LOGS ══ -->
+                <div id="admin-painel-logs" style="display:none;">
+                    <h2 style="font-size:16px;font-weight:700;margin-bottom:16px;"><i class="fas fa-history"></i> Log de Atividades</h2>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;align-items:flex-end;">
+                        <div>
+                            <label style="font-size:12px;font-weight:600;color:var(--cor-texto-secundario);display:block;margin-bottom:4px;">Usuário</label>
+                            <select id="log-filtro-usuario" style="padding:7px 12px;border:1px solid var(--cor-borda);border-radius:var(--radius);font-size:13px;">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size:12px;font-weight:600;color:var(--cor-texto-secundario);display:block;margin-bottom:4px;">Ação</label>
+                            <select id="log-filtro-acao" style="padding:7px 12px;border:1px solid var(--cor-borda);border-radius:var(--radius);font-size:13px;">
+                                <option value="">Todas</option>
+                                <option value="login">Login</option>
+                                <option value="logout">Logout</option>
+                                <option value="criar">Criar</option>
+                                <option value="editar">Editar</option>
+                                <option value="excluir">Excluir</option>
+                                <option value="alterar_senha">Alterar senha</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size:12px;font-weight:600;color:var(--cor-texto-secundario);display:block;margin-bottom:4px;">Entidade</label>
+                            <select id="log-filtro-entidade" style="padding:7px 12px;border:1px solid var(--cor-borda);border-radius:var(--radius);font-size:13px;">
+                                <option value="">Todas</option>
+                                <option value="contato">Contato</option>
+                                <option value="tarefa">Tarefa</option>
+                                <option value="quadro">Quadro</option>
+                                <option value="agenda">Agenda</option>
+                                <option value="usuario">Usuário</option>
+                                <option value="config">Config</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primario" onclick="aplicarFiltrosLog()" style="padding:7px 16px;"><i class="fas fa-search"></i> Filtrar</button>
+                    </div>
+                    <div class="tabela-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data/Hora</th>
+                                    <th>Usuário</th>
+                                    <th>Ação</th>
+                                    <th>Entidade</th>
+                                    <th>Detalhes</th>
+                                    <th>IP</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-logs-body">
+                                <tr><td colspan="6" style="text-align:center;padding:30px;">Carregando...</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="paginacao" id="admin-logs-paginacao"></div>
+                    </div>
+                </div>
+
+                <!-- ══ ABA: CONFIGURAÇÕES ══ -->
+                <div id="admin-painel-configs" style="display:none;">
+                    <h2 style="font-size:16px;font-weight:700;margin-bottom:16px;"><i class="fas fa-sliders-h"></i> Configurações do Sistema</h2>
+                    <div class="tabela-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Chave</th>
+                                    <th>Valor</th>
+                                    <th>Descrição</th>
+                                    <th style="width:60px;">Salvar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-configs-body">
+                                <tr><td colspan="4" style="text-align:center;padding:30px;">Carregando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal: Usuário -->
+            <div id="modal-usuario" class="modal-overlay" onclick="if(event.target===this)fecharModalUsuario()">
+                <div class="modal" style="max-width:480px;">
+                    <div class="modal-header">
+                        <h2 id="modal-usuario-titulo">Novo Usuário</h2>
+                        <button class="btn-fechar" onclick="fecharModalUsuario()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="form-usuario" onsubmit="event.preventDefault();salvarUsuario();">
+                            <input type="hidden" id="form-usuario-id">
+                            <div class="form-group">
+                                <label>Nome completo *</label>
+                                <input type="text" id="form-usuario-nome" placeholder="Nome completo" required minlength="3">
+                            </div>
+                            <div class="form-group">
+                                <label>E-mail *</label>
+                                <input type="email" id="form-usuario-email" placeholder="email@exemplo.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Nível de acesso *</label>
+                                <select id="form-usuario-nivel" required>
+                                    <option value="operador">Operador</option>
+                                    <option value="coordenador">Coordenador</option>
+                                    <option value="visualizador">Visualizador</option>
+                                    <option value="admin">Administrador</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="form-usuario-senha-group">
+                                <label>Senha * <small style="color:var(--cor-texto-secundario);">(mín. 6 caracteres)</small></label>
+                                <input type="password" id="form-usuario-senha" placeholder="Senha inicial" minlength="6">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline" onclick="fecharModalUsuario()">Cancelar</button>
+                        <button class="btn btn-primario" onclick="salvarUsuario()"><i class="fas fa-save"></i> Salvar</button>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div id="page-perfil" class="page">
+                <div class="page-header">
+                    <h1><i class="fas fa-user-circle"></i> Meu Perfil</h1>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+                    <!-- Dados do Perfil -->
+                    <div class="card-secao">
+                        <h2 style="margin-bottom:20px;"><i class="fas fa-id-card"></i> Meus Dados</h2>
+                        <div style="text-align:center;margin-bottom:24px;">
+                            <div id="perfil-avatar" style="width:80px;height:80px;border-radius:50%;background:var(--cor-primaria);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:0 auto 12px;overflow:hidden;"></div>
+                        </div>
+                        <div style="margin-bottom:20px;padding:16px;background:var(--cor-fundo);border-radius:var(--radius);text-align:center;">
+                            <label style="font-size:13px;font-weight:600;display:block;margin-bottom:8px;">Foto de Perfil</label>
+                            <div id="perfil-foto-preview" style="margin-bottom:10px;"></div>
+                            <input type="file" id="perfil-foto-input" accept="image/jpeg,image/png,image/gif,image/webp" style="font-size:12px;margin-bottom:8px;display:block;width:100%;">
+                            <div style="display:flex;gap:8px;justify-content:center;">
+                                <button class="btn btn-primario" onclick="uploadFotoPerfil()" style="font-size:12px;padding:6px 14px;"><i class="fas fa-upload"></i> Enviar</button>
+                                <button class="btn btn-outline" onclick="removerFotoPerfil()" style="font-size:12px;padding:6px 14px;color:var(--cor-perigo);border-color:var(--cor-perigo);"><i class="fas fa-trash"></i> Remover</button>
+                            </div>
+                        </div>
+                        <table style="width:100%;">
+                            <tr>
+                                <td style="padding:10px 12px;font-weight:600;color:var(--cor-texto-secundario);border-bottom:1px solid var(--cor-borda);width:100px;">Nome</td>
+                                <td style="padding:10px 12px;border-bottom:1px solid var(--cor-borda);" id="perfil-nome">-</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:10px 12px;font-weight:600;color:var(--cor-texto-secundario);border-bottom:1px solid var(--cor-borda);">E-mail</td>
+                                <td style="padding:10px 12px;border-bottom:1px solid var(--cor-borda);" id="perfil-email">-</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:10px 12px;font-weight:600;color:var(--cor-texto-secundario);">Nível</td>
+                                <td style="padding:10px 12px;" id="perfil-nivel">-</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Alterar Senha -->
+                    <div class="card-secao">
+                        <h2 style="margin-bottom:20px;"><i class="fas fa-key"></i> Alterar Senha</h2>
+
+                        <div id="perfil-senha-msg" class="alerta" style="display:none;"></div>
+
+                        <div class="form-group">
+                            <label>Senha atual</label>
+                            <input type="password" id="perfil-senha-atual" placeholder="Digite sua senha atual">
+                        </div>
+                        <div class="form-group">
+                            <label>Nova senha <small style="color:var(--cor-texto-secundario);">(mín. 6 caracteres)</small></label>
+                            <input type="password" id="perfil-senha-nova" placeholder="Digite a nova senha">
+                        </div>
+                        <div class="form-group">
+                            <label>Confirmar nova senha</label>
+                            <input type="password" id="perfil-senha-confirmar" placeholder="Repita a nova senha" onkeypress="if(event.key==='Enter')alterarSenhaPerfil()">
+                        </div>
+                        <button class="btn btn-primario btn-block" onclick="alterarSenhaPerfil()" style="margin-top:8px;">
+                            <i class="fas fa-save"></i> Alterar Senha
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+    
+// ============================================================
+// UTILS — Comunicação com API, validações, formatações
+// ============================================================
+
+const API_URL = 'https://script.google.com/macros/s/AKfycbyikLrkeCHBvhJPog_iVI-22basmbvXoebtJ47rf9iXsYfKVr6IK98eHgsRw3nM_Wip/exec';
+const DATA_ELEICAO = '2026-10-04';
+const VERSAO = '1.0.0';
+
+// ── Estado global ──
+let estadoApp = {
+  token: '',
+  perfil: null,
+  estadosCache: [],
+  municipiosCache: {}
+};
+
+// ── Comunicação com API ──
+async function apiPost(acao, dados) {
+  const payload = {
+    acao: acao,
+    token: estadoApp.token,
+    dados: dados || {},
+    ip: ''
+  };
+
+  // Tenta obter IP (não-bloqueante)
+  try {
+    if (!estadoApp.ip) {
+      const r = await fetch('https://api.ipify.org?format=json', {signal: AbortSignal.timeout(3000)});
+      const d = await r.json();
+      estadoApp.ip = d.ip;
+    }
+    payload.ip = estadoApp.ip || '';
+  } catch(e) { /* sem IP, continua */ }
+
+  try {
+    const resp = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload),
+      redirect: 'follow'
+    });
+    const resultado = await resp.json();
+    
+    // Se sessão expirou, redireciona para login
+    if (!resultado.sucesso && resultado.codigo === 401 && acao !== 'auth.login') {
+      toast('Sessão expirada. Faça login novamente.', 'erro');
+      fazerLogout();
+      return resultado;
+    }
+    
+    return resultado;
+  } catch (erro) {
+    console.error('Erro na API:', erro);
+    return { sucesso: false, mensagem: 'Erro de conexão com o servidor.', codigo: 0 };
+  }
+}
+
+// ── Sessão ──
+function salvarSessao(token, perfil) {
+  estadoApp.token = token;
+  estadoApp.perfil = perfil;
+  sessionStorage.setItem('token', token);
+  sessionStorage.setItem('perfil', JSON.stringify(perfil));
+}
+
+function carregarSessao() {
+  estadoApp.token = sessionStorage.getItem('token') || '';
+  const perfilStr = sessionStorage.getItem('perfil');
+  estadoApp.perfil = perfilStr ? JSON.parse(perfilStr) : null;
+  return !!estadoApp.token;
+}
+
+function limparSessao() {
+  estadoApp.token = '';
+  estadoApp.perfil = null;
+  estadoApp.estadosCache = [];
+  estadoApp.municipiosCache = {};
+  sessionStorage.clear();
+}
+
+// ── Permissões no front-end ──
+function temPermissao(acao) {
+  if (!estadoApp.perfil) return false;
+  const nivel = estadoApp.perfil.nivel_acesso;
+  const p = {
+    'contatos.criar':  ['admin','coordenador','operador'],
+    'contatos.excluir': ['admin','coordenador'],
+    'quadros.criar':   ['admin','coordenador'],
+    'quadros.excluir': ['admin','coordenador'],
+    'tarefas.criar':   ['admin','coordenador','operador'],
+    'tarefas.excluir': ['admin','coordenador'],
+    'agenda.criar':    ['admin','coordenador'],
+    'agenda.excluir':  ['admin','coordenador'],
+    'admin':           ['admin'],
+    'log':             ['admin','coordenador'],
+    'exportar':        ['admin','coordenador'],
+  };
+  const permitidos = p[acao];
+  return permitidos ? permitidos.includes(nivel) : true;
+}
+
+// ── Validações ──
+function validarCPF(cpf) {
+  if (!cpf) return true;
+  const d = cpf.replace(/\D/g, '');
+  if (d.length !== 11) return false;
+  if (/^(\d)\1{10}$/.test(d)) return false;
+  let soma = 0;
+  for (let i = 0; i < 9; i++) soma += parseInt(d[i]) * (10 - i);
+  let resto = (soma * 10) % 11;
+  if (resto === 10) resto = 0;
+  if (resto !== parseInt(d[9])) return false;
+  soma = 0;
+  for (let i = 0; i < 10; i++) soma += parseInt(d[i]) * (11 - i);
+  resto = (soma * 10) % 11;
+  if (resto === 10) resto = 0;
+  return resto === parseInt(d[10]);
+}
+
+function validarWhatsApp(fone) {
+  const d = fone.replace(/\D/g, '');
+  if (d.length !== 11) return false;
+  if (d[2] !== '9') return false;
+  const dddsValidos = ['11','12','13','14','15','16','17','18','19','21','22','24','27','28','31','32','33','34','35','37','38','41','42','43','44','45','46','47','48','49','51','53','54','55','61','62','63','64','65','66','67','68','69','71','73','74','75','77','79','81','82','83','84','85','86','87','88','89','91','92','93','94','95','96','97','98','99'];
+  return dddsValidos.includes(d.substring(0,2));
+}
+
+function validarEmail(email) {
+  if (!email) return true;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function validarCEP(cep) {
+  if (!cep) return true;
+  return cep.replace(/\D/g, '').length === 8;
+}
+
+// ── Formatações ──
+function formatarCPF(cpf) {
+  const d = cpf.replace(/\D/g, '');
+  if (d.length !== 11) return cpf;
+  return d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+}
+
+function formatarWhatsApp(fone) {
+  const d = fone.replace(/\D/g, '');
+  if (d.length !== 11) return fone;
+  return '(' + d.substring(0,2) + ')' + d.substring(2,7) + '-' + d.substring(7);
+}
+
+function formatarCEP(cep) {
+  const d = cep.replace(/\D/g, '');
+  if (d.length !== 8) return cep;
+  return d.substring(0,5) + '-' + d.substring(5);
+}
+
+function formatarData(dataISO) {
+  if (!dataISO) return '';
+  const d = dataISO.substring(0, 10);
+  const partes = d.split('-');
+  if (partes.length !== 3) return d;
+  return partes[2] + '/' + partes[1] + '/' + partes[0];
+}
+
+function formatarDataHora(datetimeISO) {
+  if (!datetimeISO) return '';
+  const data = formatarData(datetimeISO);
+  const hora = datetimeISO.substring(11, 16);
+  return data + (hora ? ' ' + hora : '');
+}
+
+function tempoAtras(datetimeISO) {
+  if (!datetimeISO) return '';
+  const agora = new Date();
+  const dt = new Date(datetimeISO);
+  const diff = Math.floor((agora - dt) / 1000);
+  if (diff < 60) return 'agora';
+  if (diff < 3600) return Math.floor(diff / 60) + ' min atrás';
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h atrás';
+  if (diff < 604800) return Math.floor(diff / 86400) + 'd atrás';
+  return formatarData(datetimeISO);
+}
+
+// ── Toast / Notificação ──
+function toast(mensagem, tipo) {
+  tipo = tipo || 'info';
+  const container = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = 'toast toast-' + tipo;
+  const icones = { sucesso: 'fa-check-circle', erro: 'fa-exclamation-circle', info: 'fa-info-circle' };
+  el.innerHTML = '<i class="fas ' + (icones[tipo] || 'fa-info-circle') + '"></i> ' + mensagem;
+  container.appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 4000);
+}
+
+// ── Loading ──
+function mostrarLoading() {
+  document.getElementById('loading-global').style.display = 'flex';
+}
+
+function esconderLoading() {
+  document.getElementById('loading-global').style.display = 'none';
+}
+
+// ── Máscaras de input ──
+function aplicarMascara(input, tipo) {
+  input.addEventListener('input', function(e) {
+    let v = this.value.replace(/\D/g, '');
+    if (tipo === 'cpf') {
+      v = v.substring(0, 11);
+      this.value = v;
+    } else if (tipo === 'whatsapp') {
+      v = v.substring(0, 11);
+      this.value = v;
+    } else if (tipo === 'cep') {
+      v = v.substring(0, 8);
+      this.value = v;
+    }
+  });
+}
+
+    
+// ============================================================
+// AUTH — Login, Logout, verificação de sessão
+// ============================================================
+
+async function fazerLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const senha = document.getElementById('login-senha').value;
+  const btnEntrar = document.getElementById('btn-entrar');
+  const alerta = document.getElementById('login-alerta');
+
+  alerta.style.display = 'none';
+
+  if (!email || !senha) {
+    alerta.textContent = 'Preencha e-mail e senha.';
+    alerta.style.display = 'block';
+    return;
+  }
+
+  btnEntrar.disabled = true;
+  btnEntrar.innerHTML = '<span class="spinner-sm" style="width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:girar 0.8s linear infinite;display:inline-block;"></span> Entrando...';
+
+  const resp = await apiPost('auth.login', { email: email, senha: senha });
+
+  btnEntrar.disabled = false;
+  btnEntrar.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+
+  if (resp.sucesso) {
+    salvarSessao(resp.dados.token, resp.dados.perfil);
+    exibirApp();
+    toast('Bem-vindo, ' + resp.dados.perfil.nome + '!', 'sucesso');
+  } else {
+    alerta.textContent = resp.mensagem || 'Erro ao fazer login.';
+    alerta.style.display = 'block';
+    document.getElementById('login-senha').value = '';
+  }
+}
+
+function fazerLogout() {
+  apiPost('auth.logout').catch(() => {});
+  limparSessao();
+  exibirLogin();
+  toast('Você saiu do sistema.', 'info');
+}
+
+function exibirLogin() {
+  document.getElementById('login-page').style.display = 'flex';
+  document.getElementById('app-container').style.display = 'none';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-senha').value = '';
+  document.getElementById('login-alerta').style.display = 'none';
+}
+
+function exibirApp() {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('app-container').style.display = 'flex';
+  atualizarSidebar();
+  navegar('painel');
+}
+
+function atualizarSidebar() {
+  const perfil = estadoApp.perfil;
+  if (!perfil) return;
+
+  // Avatar: foto ou iniciais
+  const avatarEl = document.getElementById('user-avatar');
+  if (perfil.foto_url) {
+    avatarEl.innerHTML = '<img src="' + corrigirUrlFotoDrive(perfil.foto_url) + '" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">';
+    avatarEl.style.background = 'none';
+    avatarEl.style.padding = '0';
+  } else {
+    const iniciais = perfil.nome.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase();
+    avatarEl.textContent = iniciais;
+    avatarEl.innerHTML = iniciais;
+    avatarEl.style.background = '';
+  }
+  document.getElementById('user-name').textContent = perfil.nome;
+  document.getElementById('user-role').textContent = perfil.nivel_acesso;
+
+  // Visibilidade dos itens do menu por nível de acesso
+  const itemAdmin = document.getElementById('nav-admin');
+  if (itemAdmin) {
+    itemAdmin.style.display = temPermissao('admin') ? 'flex' : 'none';
+  }
+}
+
+    
+// ============================================================
+// PAINEL — Dashboard principal com contador e resumos
+// ============================================================
+
+function atualizarContador() {
+  const dataEleicao = new Date(DATA_ELEICAO + 'T00:00:00');
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  const diffMs = dataEleicao - hoje;
+  const dias = Math.ceil(diffMs / 86400000);
+
+  const numEl = document.getElementById('contador-dias');
+  const textoEl = document.getElementById('contador-texto');
+  const dataEl = document.getElementById('contador-data');
+
+  if (dias > 0) {
+    numEl.textContent = dias;
+    textoEl.textContent = dias === 1 ? 'DIA PARA A ELEIÇÃO' : 'DIAS PARA A ELEIÇÃO';
+  } else if (dias === 0) {
+    numEl.textContent = '🗳️';
+    textoEl.textContent = 'HOJE É DIA DE ELEIÇÃO!';
+  } else {
+    numEl.textContent = Math.abs(dias);
+    textoEl.textContent = Math.abs(dias) === 1 ? 'DIA DESDE A ELEIÇÃO' : 'DIAS DESDE A ELEIÇÃO';
+  }
+
+  const meses = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  dataEl.textContent = dataEleicao.getDate().toString().padStart(2,'0') + ' de ' + meses[dataEleicao.getMonth()] + ' de ' + dataEleicao.getFullYear();
+}
+
+async function carregarPainel() {
+  atualizarContador();
+
+  // Carrega resumos
+  try {
+    const [respContatos, respTarefas, respAgenda] = await Promise.all([
+      apiPost('dashboard.contatos'),
+      apiPost('dashboard.planejador'),
+      apiPost('agenda.listar', { data_inicio: new Date().toISOString().substring(0,10) })
+    ]);
+
+    if (respContatos.sucesso) {
+      document.getElementById('kpi-contatos').textContent = respContatos.dados.total || 0;
+    }
+
+    if (respTarefas.sucesso) {
+      const pendentes = (respTarefas.dados.por_status || []).find(s => s.valor === 'pendente');
+      document.getElementById('kpi-tarefas').textContent = pendentes ? pendentes.quantidade : 0;
+      document.getElementById('kpi-atrasadas').textContent = respTarefas.dados.total_atrasadas || 0;
+    }
+
+    if (respAgenda.sucesso) {
+      document.getElementById('kpi-eventos').textContent = respAgenda.dados.total || 0;
+    }
+  } catch(e) {
+    console.error('Erro ao carregar KPIs:', e);
+  }
+
+  // Carrega atividades recentes (admin/coordenador)
+  if (temPermissao('log')) {
+    try {
+      const resp = await apiPost('log.listar', { por_pagina: 10 });
+      if (resp.sucesso) {
+        renderizarAtividades(resp.dados.registros || []);
+      }
+    } catch(e) {}
+  }
+}
+
+function renderizarAtividades(atividades) {
+  const lista = document.getElementById('lista-atividades');
+  if (!lista) return;
+
+  if (atividades.length === 0) {
+    lista.innerHTML = '<li style="color:var(--cor-texto-secundario);text-align:center;padding:20px;">Nenhuma atividade registrada.</li>';
+    return;
+  }
+
+  lista.innerHTML = atividades.map(a => {
+    const iconesAcao = {
+      login: 'fa-sign-in-alt', logout: 'fa-sign-out-alt',
+      criar: 'fa-plus', editar: 'fa-edit',
+      excluir: 'fa-trash', alterar_senha: 'fa-key'
+    };
+    const classesAcao = {
+      login: 'login', logout: 'login',
+      criar: 'criar', editar: 'editar',
+      excluir: 'excluir', alterar_senha: 'editar'
+    };
+    const icone = iconesAcao[a.acao] || 'fa-circle';
+    const classe = classesAcao[a.acao] || 'login';
+    const descricao = (a.usuario_nome || 'Usuário') + ' — ' + (a.acao || '') + ' ' + (a.entidade || '');
+
+    return '<li>' +
+      '<div class="atividade-icon ' + classe + '"><i class="fas ' + icone + '"></i></div>' +
+      '<span class="atividade-texto">' + descricao + '</span>' +
+      '<span class="atividade-hora">' + tempoAtras(a.timestamp) + '</span>' +
+    '</li>';
+  }).join('');
+}
+
+// Atualiza contador a cada minuto
+setInterval(atualizarContador, 60000);
+
+    
+// ============================================================
+// CONTATOS — CRUD completo com filtros, busca, dropdowns IBGE
+// ============================================================
+
+let contatosState = {
+  registros: [],
+  pagina: 1,
+  porPagina: 15,
+  total: 0,
+  totalPaginas: 0,
+  filtros: { busca: '', categoria: '', estado: '', municipio: '' },
+  editandoId: null
+};
+
+// ── Carregar estados (IBGE) ──
+async function carregarEstadosDropdown() {
+  if (estadoApp.estadosCache.length > 0) return;
+  const resp = await apiPost('municipios.estados');
+  if (resp.sucesso) {
+    estadoApp.estadosCache = resp.dados || [];
+  }
+}
+
+async function popularDropdownEstados(selectId, valorSelecionado) {
+  await carregarEstadosDropdown();
+  const sel = document.getElementById(selectId);
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Selecione o estado...</option>';
+  estadoApp.estadosCache.forEach(e => {
+    const opt = document.createElement('option');
+    opt.value = e.sigla;
+    opt.textContent = e.sigla + ' — ' + e.nome;
+    if (valorSelecionado && e.sigla === valorSelecionado) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+async function carregarMunicipiosDropdown(selectId, siglaEstado, valorSelecionado) {
+  const sel = document.getElementById(selectId);
+  if (!sel) return;
+  if (!siglaEstado) {
+    sel.innerHTML = '<option value="">Selecione um estado primeiro</option>';
+    sel.disabled = true;
+    return;
+  }
+  sel.innerHTML = '<option value="">Carregando...</option>';
+  sel.disabled = true;
+
+  if (!estadoApp.municipiosCache[siglaEstado]) {
+    const resp = await apiPost('municipios.por_estado', { estado: siglaEstado });
+    if (resp.sucesso) {
+      estadoApp.municipiosCache[siglaEstado] = resp.dados || [];
+    } else {
+      sel.innerHTML = '<option value="">Erro ao carregar</option>';
+      return;
+    }
+  }
+
+  const munis = estadoApp.municipiosCache[siglaEstado];
+  sel.innerHTML = '<option value="">Selecione o município...</option>';
+  munis.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.nome;
+    opt.textContent = m.nome;
+    if (valorSelecionado && m.nome === valorSelecionado) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  sel.disabled = false;
+}
+
+// ── Listar contatos ──
+async function carregarContatos(pagina) {
+  contatosState.pagina = pagina || contatosState.pagina;
+  const params = {
+    pagina: contatosState.pagina,
+    por_pagina: contatosState.porPagina
+  };
+  if (contatosState.filtros.busca) params.busca = contatosState.filtros.busca;
+  if (contatosState.filtros.categoria) params.categoria = contatosState.filtros.categoria;
+  if (contatosState.filtros.estado) params.estado = contatosState.filtros.estado;
+  if (contatosState.filtros.municipio) params.municipio = contatosState.filtros.municipio;
+
+  document.getElementById('contatos-tabela-body').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;"><div class="loading-inline"><span class="spinner-sm"></span> Carregando...</div></td></tr>';
+
+  const resp = await apiPost('contatos.listar', params);
+  if (!resp.sucesso) {
+    toast(resp.mensagem, 'erro');
+    return;
+  }
+
+  contatosState.registros = resp.dados.registros;
+  contatosState.total = resp.dados.total;
+  contatosState.totalPaginas = resp.dados.total_paginas;
+  contatosState.pagina = resp.dados.pagina;
+
+  renderizarTabelaContatos();
+  renderizarPaginacaoContatos();
+  document.getElementById('contatos-total').textContent = contatosState.total + ' contato' + (contatosState.total !== 1 ? 's' : '');
+}
+
+function renderizarTabelaContatos() {
+  const tbody = document.getElementById('contatos-tabela-body');
+  if (contatosState.registros.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--cor-texto-secundario);">Nenhum contato encontrado.</td></tr>';
+    return;
+  }
+
+  const categoriaBadge = { eleitor: 'badge-azul', lideranca: 'badge-laranja', apoiador: 'badge-verde', voluntario: 'badge-cinza', outro: 'badge-cinza' };
+  const categoriaLabel = { eleitor: 'Eleitor', lideranca: 'Liderança', apoiador: 'Apoiador', voluntario: 'Voluntário', outro: 'Outro' };
+
+  tbody.innerHTML = contatosState.registros.map(c => {
+    const badge = categoriaBadge[c.categoria] || 'badge-cinza';
+    const label = categoriaLabel[c.categoria] || c.categoria;
+    const foto = c.foto_url ? '<img src="' + corrigirUrlFotoDrive(c.foto_url) + '" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">' : '<div style="width:32px;height:32px;border-radius:50%;background:var(--cor-primaria-light);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--cor-primaria);">' + (c.nome||'?').charAt(0).toUpperCase() + '</div>';
+
+    return '<tr>' +
+      '<td><div style="display:flex;align-items:center;gap:10px;">' + foto + '<div><strong>' + (c.nome||'') + '</strong></div></div></td>' +
+      '<td><span class="badge ' + badge + '">' + label + '</span></td>' +
+      '<td>' + (c.whatsapp||'') + '</td>' +
+      '<td>' + (c.municipio||'') + '</td>' +
+      '<td>' + (c.estado||'') + '</td>' +
+      '<td>' + formatarData(c.criado_em) + '</td>' +
+      '<td style="white-space:nowrap;">' +
+        '<button class="btn btn-outline" style="padding:5px 10px;font-size:12px;" onclick="visualizarContato(\'' + c.id + '\')" title="Ver"><i class="fas fa-eye"></i></button> ' +
+        (temPermissao('contatos.criar') ? '<button class="btn btn-outline" style="padding:5px 10px;font-size:12px;" onclick="editarContatoModal(\'' + c.id + '\')" title="Editar"><i class="fas fa-edit"></i></button> ' : '') +
+        (temPermissao('contatos.excluir') ? '<button class="btn btn-outline" style="padding:5px 10px;font-size:12px;color:var(--cor-perigo);border-color:var(--cor-perigo);" onclick="excluirContatoConfirmar(\'' + c.id + '\', \'' + (c.nome||'').replace(/'/g,'') + '\')" title="Excluir"><i class="fas fa-trash"></i></button>' : '') +
+      '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+function renderizarPaginacaoContatos() {
+  const container = document.getElementById('contatos-paginacao');
+  if (contatosState.totalPaginas <= 1) { container.innerHTML = ''; return; }
+
+  let html = '<button ' + (contatosState.pagina <= 1 ? 'disabled' : '') + ' onclick="carregarContatos(' + (contatosState.pagina - 1) + ')"><i class="fas fa-chevron-left"></i></button>';
+  const inicio = Math.max(1, contatosState.pagina - 2);
+  const fim = Math.min(contatosState.totalPaginas, contatosState.pagina + 2);
+  for (let i = inicio; i <= fim; i++) {
+    html += '<button class="' + (i === contatosState.pagina ? 'ativa' : '') + '" onclick="carregarContatos(' + i + ')">' + i + '</button>';
+  }
+  html += '<button ' + (contatosState.pagina >= contatosState.totalPaginas ? 'disabled' : '') + ' onclick="carregarContatos(' + (contatosState.pagina + 1) + ')"><i class="fas fa-chevron-right"></i></button>';
+  container.innerHTML = html;
+}
+
+// ── Filtros ──
+function aplicarFiltrosContatos() {
+  contatosState.filtros.busca = document.getElementById('contatos-busca').value.trim();
+  contatosState.filtros.categoria = document.getElementById('contatos-filtro-categoria').value;
+  contatosState.filtros.estado = document.getElementById('contatos-filtro-estado').value;
+  contatosState.filtros.municipio = document.getElementById('contatos-filtro-municipio').value;
+  carregarContatos(1);
+}
+
+function limparFiltrosContatos() {
+  document.getElementById('contatos-busca').value = '';
+  document.getElementById('contatos-filtro-categoria').value = '';
+  document.getElementById('contatos-filtro-estado').value = '';
+  document.getElementById('contatos-filtro-municipio').value = '';
+  document.getElementById('contatos-filtro-municipio').disabled = true;
+  document.getElementById('contatos-filtro-municipio').innerHTML = '<option value="">Todos</option>';
+  contatosState.filtros = { busca: '', categoria: '', estado: '', municipio: '' };
+  carregarContatos(1);
+}
+
+async function onFiltroEstadoChange() {
+  const sigla = document.getElementById('contatos-filtro-estado').value;
+  const selMun = document.getElementById('contatos-filtro-municipio');
+  if (!sigla) {
+    selMun.innerHTML = '<option value="">Todos</option>';
+    selMun.disabled = true;
+    contatosState.filtros.municipio = '';
+    return;
+  }
+  await carregarMunicipiosDropdown('contatos-filtro-municipio', sigla);
+  // Adiciona "Todos" como primeira opção
+  const optTodos = document.createElement('option');
+  optTodos.value = '';
+  optTodos.textContent = 'Todos';
+  selMun.insertBefore(optTodos, selMun.firstChild);
+  selMun.value = '';
+}
+
+// ── Modal: Novo / Editar ──
+async function abrirModalContato(id) {
+  contatosState.editandoId = id || null;
+  const titulo = id ? 'Editar Contato' : 'Novo Contato';
+  document.getElementById('modal-contato-titulo').textContent = titulo;
+
+  // Limpa formulário
+  document.getElementById('form-contato').reset();
+  document.getElementById('form-contato-foto-preview').innerHTML = '';
+  document.getElementById('form-contato-foto-preview').style.display = 'none';
+
+  // Popula dropdown de estados
+  await popularDropdownEstados('form-contato-estado');
+
+  // Desabilita município até selecionar estado
+  const selMun = document.getElementById('form-contato-municipio');
+  selMun.innerHTML = '<option value="">Selecione um estado primeiro</option>';
+  selMun.disabled = true;
+
+  // Se editando, preenche os campos
+  if (id) {
+    mostrarLoading();
+    const resp = await apiPost('contatos.obter', { id: id });
+    esconderLoading();
+    if (!resp.sucesso) { toast(resp.mensagem, 'erro'); return; }
+    const c = resp.dados;
+
+    document.getElementById('form-contato-nome').value = c.nome || '';
+    document.getElementById('form-contato-categoria').value = c.categoria || '';
+    document.getElementById('form-contato-whatsapp').value = (c.whatsapp||'').replace(/\D/g, '');
+    document.getElementById('form-contato-cpf').value = (c.cpf||'').replace(/\D/g, '');
+    document.getElementById('form-contato-email').value = c.email || '';
+    document.getElementById('form-contato-nascimento').value = (c.data_nascimento||'').substring(0,10);
+    document.getElementById('form-contato-cep').value = (c.cep||'').replace(/\D/g, '');
+    document.getElementById('form-contato-observacoes').value = c.observacoes || '';
+
+    // Estado e município
+    if (c.estado) {
+      await popularDropdownEstados('form-contato-estado', c.estado);
+      await carregarMunicipiosDropdown('form-contato-municipio', c.estado, c.municipio);
+    }
+
+    // Foto
+    if (c.foto_url) {
+      document.getElementById('form-contato-foto-preview').innerHTML = '<img src="' + corrigirUrlFotoDrive(c.foto_url) + '" style="width:80px;height:80px;border-radius:50%;object-fit:cover;">';
+      document.getElementById('form-contato-foto-preview').style.display = 'block';
+    }
+  }
+
+  document.getElementById('modal-contato').classList.add('visivel');
+}
+
+function editarContatoModal(id) { abrirModalContato(id); }
+
+function fecharModalContato() {
+  document.getElementById('modal-contato').classList.remove('visivel');
+  contatosState.editandoId = null;
+}
+
+async function onFormEstadoChange() {
+  const sigla = document.getElementById('form-contato-estado').value;
+  await carregarMunicipiosDropdown('form-contato-municipio', sigla);
+}
+
+async function salvarContato() {
+  // Coleta dados
+  const dados = {
+    nome: document.getElementById('form-contato-nome').value.trim(),
+    categoria: document.getElementById('form-contato-categoria').value,
+    whatsapp: document.getElementById('form-contato-whatsapp').value.replace(/\D/g, ''),
+    cpf: document.getElementById('form-contato-cpf').value.replace(/\D/g, ''),
+    email: document.getElementById('form-contato-email').value.trim(),
+    data_nascimento: document.getElementById('form-contato-nascimento').value,
+    estado: document.getElementById('form-contato-estado').value,
+    municipio: document.getElementById('form-contato-municipio').value,
+    cep: document.getElementById('form-contato-cep').value.replace(/\D/g, ''),
+    observacoes: document.getElementById('form-contato-observacoes').value
+  };
+
+  // Validações no front-end
+  let erros = [];
+  if (!dados.nome || dados.nome.length < 3) erros.push('Nome é obrigatório (mínimo 3 caracteres).');
+  if (!dados.categoria) erros.push('Categoria é obrigatória.');
+  if (!dados.whatsapp) erros.push('WhatsApp é obrigatório.');
+  else if (!validarWhatsApp(dados.whatsapp)) erros.push('WhatsApp inválido (11 dígitos: DDD + 9 + número).');
+  if (!dados.estado) erros.push('Estado é obrigatório.');
+  if (!dados.municipio) erros.push('Município é obrigatório.');
+  if (dados.cpf && !validarCPF(dados.cpf)) erros.push('CPF inválido.');
+  if (dados.email && !validarEmail(dados.email)) erros.push('E-mail inválido.');
+  if (dados.cep && !validarCEP(dados.cep)) erros.push('CEP inválido (8 dígitos).');
+
+  if (erros.length > 0) {
+    toast(erros[0], 'erro');
+    return;
+  }
+
+  // Upload de foto se houver
+  const fotoInput = document.getElementById('form-contato-foto');
+  if (fotoInput && fotoInput.files.length > 0) {
+    const file = fotoInput.files[0];
+    if (file.size > 5 * 1024 * 1024) { toast('Foto muito grande (máximo 5MB).', 'erro'); return; }
+    try {
+      const base64 = await fileToBase64(file);
+      const nomeArq = 'contato_' + dados.nome.replace(/[^a-zA-Z0-9À-ú]/g, '_').substring(0, 40) + '_' + Date.now();
+      const respFoto = await apiPost('upload.foto', {
+        nome_arquivo: nomeArq,
+        base64: base64,
+        tipo_mime: file.type,
+        contato_id: contatosState.editandoId || ''
+      });
+      if (respFoto.sucesso) {
+        dados.foto_url = respFoto.dados.url;
+      } else {
+        toast(respFoto.mensagem || 'Erro ao enviar foto.', 'erro');
+        return;
+      }
+    } catch(e) { toast('Erro ao enviar foto: ' + e.message, 'erro'); console.error(e); }
+  }
+
+  mostrarLoading();
+  let resp;
+  if (contatosState.editandoId) {
+    dados.id = contatosState.editandoId;
+    resp = await apiPost('contatos.editar', dados);
+  } else {
+    resp = await apiPost('contatos.criar', dados);
+  }
+  esconderLoading();
+
+  if (resp.sucesso) {
+    toast(resp.mensagem, 'sucesso');
+    fecharModalContato();
+    carregarContatos(contatosState.pagina);
+  } else {
+    toast(resp.mensagem, 'erro');
+  }
+}
+
+function corrigirUrlFotoDrive(url) {
+  if (!url) return '';
+  // Formato antigo: drive.google.com/uc?export=view&id=XXX
+  var match = url.match(/[?&]id=([^&]+)/);
+  if (match) return 'https://lh3.googleusercontent.com/d/' + match[1] + '=s800';
+  // Formato antigo: drive.google.com/d/XXX/
+  match = url.match(/\/d\/([^\/=]+)/);
+  if (match) return 'https://lh3.googleusercontent.com/d/' + match[1] + '=s800';
+  // Já é lh3 ou outro formato
+  return url;
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      const base64 = result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── Visualizar contato ──
+async function visualizarContato(id) {
+  mostrarLoading();
+  const resp = await apiPost('contatos.obter', { id: id });
+  esconderLoading();
+  if (!resp.sucesso) { toast(resp.mensagem, 'erro'); return; }
+  const c = resp.dados;
+
+  const categoriaLabel = { eleitor: 'Eleitor', lideranca: 'Liderança', apoiador: 'Apoiador', voluntario: 'Voluntário', outro: 'Outro' };
+  const foto = c.foto_url ? '<img src="' + corrigirUrlFotoDrive(c.foto_url) + '" style="width:100px;height:100px;border-radius:50%;object-fit:cover;margin-bottom:16px;">' : '';
+
+  document.getElementById('modal-visualizar-conteudo').innerHTML =
+    '<div style="text-align:center;">' + foto + '</div>' +
+    '<table style="width:100%;border-collapse:collapse;">' +
+    campoVisualizar('Nome', c.nome) +
+    campoVisualizar('Categoria', categoriaLabel[c.categoria] || c.categoria) +
+    campoVisualizar('WhatsApp', c.whatsapp) +
+    campoVisualizar('CPF', c.cpf) +
+    campoVisualizar('E-mail', c.email) +
+    campoVisualizar('Nascimento', formatarData(c.data_nascimento)) +
+    campoVisualizar('Estado', c.estado) +
+    campoVisualizar('Município', c.municipio) +
+    campoVisualizar('CEP', c.cep) +
+    campoVisualizar('Observações', c.observacoes) +
+    campoVisualizar('Cadastrado em', formatarDataHora(c.criado_em)) +
+    campoVisualizar('Atualizado em', formatarDataHora(c.atualizado_em)) +
+    '</table>';
+
+  document.getElementById('modal-visualizar-contato').classList.add('visivel');
+}
+
+function campoVisualizar(label, valor) {
+  if (!valor) return '';
+  return '<tr><td style="padding:8px 12px;font-weight:600;color:var(--cor-texto-secundario);width:140px;border-bottom:1px solid var(--cor-borda);font-size:13px;">' + label + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--cor-borda);font-size:14px;">' + valor + '</td></tr>';
+}
+
+function fecharModalVisualizarContato() {
+  document.getElementById('modal-visualizar-contato').classList.remove('visivel');
+}
+
+// ── Excluir contato ──
+function excluirContatoConfirmar(id, nome) {
+  if (confirm('Tem certeza que deseja excluir o contato "' + nome + '"?\nEsta ação pode ser revertida pelo administrador.')) {
+    excluirContatoExecutar(id);
+  }
+}
+
+async function excluirContatoExecutar(id) {
+  mostrarLoading();
+  const resp = await apiPost('contatos.excluir', { id: id });
+  esconderLoading();
+  if (resp.sucesso) {
+    toast(resp.mensagem, 'sucesso');
+    carregarContatos(contatosState.pagina);
+  } else {
+    toast(resp.mensagem, 'erro');
+  }
+}
+
+// ── Exportar CSV ──
+async function exportarContatosCSV() {
+  toast('Exportando contatos...', 'info');
+  const resp = await apiPost('contatos.listar', { pagina: 1, por_pagina: 99999 });
+  if (!resp.sucesso) { toast(resp.mensagem, 'erro'); return; }
+  const registros = resp.dados.registros;
+  if (registros.length === 0) { toast('Nenhum contato para exportar.', 'info'); return; }
+
+  const colunas = ['nome','categoria','whatsapp','cpf','email','data_nascimento','estado','municipio','cep','observacoes','criado_em'];
+  const header = colunas.join(';');
+  const linhas = registros.map(r => colunas.map(col => '"' + ((r[col]||'')+'').replace(/"/g, '""') + '"').join(';'));
+  const csv = '\uFEFF' + header + '\n' + linhas.join('\n');
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'contatos_' + new Date().toISOString().substring(0,10) + '.csv';
+  link.click();
+  toast('Exportação concluída: ' + registros.length + ' contatos.', 'sucesso');
+}
+
+// ── Inicialização do módulo (chamada ao navegar para contatos) ──
+function inicializarModuloContatos() {
+  // Popula dropdown de estado no filtro
+  popularDropdownEstados('contatos-filtro-estado');
+  // Carrega lista
+  carregarContatos(1);
+  // Máscaras
+  const cpfEl = document.getElementById('form-contato-cpf');
+  const whatsEl = document.getElementById('form-contato-whatsapp');
+  const cepEl = document.getElementById('form-contato-cep');
+  if (cpfEl) aplicarMascara(cpfEl, 'cpf');
+  if (whatsEl) aplicarMascara(whatsEl, 'whatsapp');
+  if (cepEl) aplicarMascara(cepEl, 'cep');
+}
+
+    
+// ============================================================
+// PLANEJADOR — Kanban com quadros e tarefas, drag & drop
+// ============================================================
+
+let planejadorState = {
+  quadros: [],
+  tarefas: [],
+  usuariosMap: {},
+  filtroResponsavel: '',
+  filtroPrioridade: '',
+  filtroStatus: '',
+  editandoTarefaId: null,
+  checklistTemp: []
+};
+
+// ── Carregar dados ──
+async function carregarPlanejador() {
+  const container = document.getElementById('kanban-container');
+  container.innerHTML = '<div style="text-align:center;padding:40px;width:100%;"><div class="loading-inline"><span class="spinner-sm"></span> Carregando quadros...</div></div>';
+
+  const [respQuadros, respTarefas, respUsuarios] = await Promise.all([
+    apiPost('quadros.listar'),
+    apiPost('tarefas.listar'),
+    apiPost('usuarios.listar').catch(() => ({ sucesso: false }))
+  ]);
+
+  if (!respQuadros.sucesso) { toast(respQuadros.mensagem, 'erro'); return; }
+  if (!respTarefas.sucesso) { toast(respTarefas.mensagem, 'erro'); return; }
+
+  planejadorState.quadros = respQuadros.dados || [];
+  planejadorState.tarefas = respTarefas.dados || [];
+
+  if (respUsuarios.sucesso) {
+    planejadorState.usuariosMap = {};
+    (respUsuarios.dados || []).forEach(u => { planejadorState.usuariosMap[u.id] = u.nome; });
+  }
+
+  renderizarKanban();
+}
+
+function renderizarKanban() {
+  const container = document.getElementById('kanban-container');
+  const quadros = planejadorState.quadros;
+  const todasTarefas = planejadorState.tarefas;
+
+  // Aplica filtros
+  let tarefasFiltradas = todasTarefas.filter(t => {
+    if (planejadorState.filtroResponsavel && t.responsavel_id !== planejadorState.filtroResponsavel) return false;
+    if (planejadorState.filtroPrioridade && t.prioridade !== planejadorState.filtroPrioridade) return false;
+    if (planejadorState.filtroStatus && t.status !== planejadorState.filtroStatus) return false;
+    return true;
+  });
+
+  let html = '';
+  quadros.forEach(q => {
+    const tarefasDoQuadro = tarefasFiltradas.filter(t => t.quadro_id === q.id);
+    const cor = q.cor || '#3498db';
+
+    html += '<div class="kanban-coluna" data-quadro-id="' + q.id + '">';
+    html += '<div class="kanban-coluna-header" style="background:' + cor + ';color:#fff;">';
+    html += '<h3>' + escapeHtml(q.nome) + ' <span class="badge-count">' + tarefasDoQuadro.length + '</span></h3>';
+
+    if (temPermissao('quadros.criar')) {
+      html += '<div class="acoes-quadro">';
+      html += '<button onclick="editarQuadroModal(\'' + q.id + '\')" title="Editar quadro"><i class="fas fa-pen"></i></button>';
+      html += '<button onclick="excluirQuadroConfirmar(\'' + q.id + '\', \'' + escapeHtml(q.nome).replace(/'/g,'') + '\')" title="Excluir quadro"><i class="fas fa-trash"></i></button>';
+      html += '</div>';
+    }
+
+    html += '</div>';
+    html += '<div class="kanban-coluna-body" data-quadro-id="' + q.id + '" ondrop="onDropTarefa(event)" ondragover="onDragOverColuna(event)" ondragleave="onDragLeaveColuna(event)">';
+
+    tarefasDoQuadro.forEach(t => {
+      html += renderizarCardTarefa(t);
+    });
+
+    if (temPermissao('tarefas.criar')) {
+      html += '<button class="kanban-add-card" onclick="abrirModalTarefa(null, \'' + q.id + '\')"><i class="fas fa-plus"></i> Nova tarefa</button>';
+    }
+
+    html += '</div></div>';
+  });
+
+  if (temPermissao('quadros.criar')) {
+    html += '<div class="kanban-add-coluna" onclick="abrirModalQuadro()"><i class="fas fa-plus" style="margin-right:8px;"></i> Novo Quadro</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+function renderizarCardTarefa(t) {
+  const prioridadeClasse = 'prioridade-' + (t.prioridade || 'media');
+  const prioridadeBadge = { urgente: 'badge-vermelho', alta: 'badge-laranja', media: 'badge-azul', baixa: 'badge-verde' };
+  const statusBadge = { pendente: 'badge-cinza', em_andamento: 'badge-azul', concluida: 'badge-verde', cancelada: 'badge-vermelho' };
+  const statusLabel = { pendente: 'Pendente', em_andamento: 'Em andamento', concluida: 'Concluída', cancelada: 'Cancelada' };
+  const responsavel = planejadorState.usuariosMap[t.responsavel_id] || '';
+
+  let checklistInfo = '';
+  if (t.checklist && t.checklist !== '[]') {
+    try {
+      const cl = JSON.parse(t.checklist);
+      if (cl.length > 0) {
+        const feitos = cl.filter(i => i.feito).length;
+        checklistInfo = '<span><i class="fas fa-check-square"></i> ' + feitos + '/' + cl.length + '</span>';
+      }
+    } catch(e) {}
+  }
+
+  let prazoInfo = '';
+  if (t.data_prazo) {
+    const hoje = new Date().toISOString().substring(0,10);
+    const prazoData = (t.data_prazo || '').substring(0,10);
+    const atrasada = prazoData < hoje && t.status !== 'concluida' && t.status !== 'cancelada';
+    prazoInfo = '<span style="' + (atrasada ? 'color:var(--cor-perigo);font-weight:600;' : '') + '"><i class="fas fa-clock"></i> ' + formatarData(t.data_prazo) + '</span>';
+  }
+
+  return '<div class="kanban-card ' + prioridadeClasse + '" draggable="true" data-tarefa-id="' + t.id + '" data-quadro-id="' + t.quadro_id + '" onclick="abrirModalTarefa(\'' + t.id + '\')" ondragstart="onDragStartTarefa(event)">' +
+    '<div class="card-titulo">' + escapeHtml(t.titulo) + '</div>' +
+    '<div class="card-meta">' +
+      '<span class="badge ' + (prioridadeBadge[t.prioridade] || 'badge-cinza') + '">' + (t.prioridade || 'media') + '</span>' +
+      '<span class="badge ' + (statusBadge[t.status] || 'badge-cinza') + '">' + (statusLabel[t.status] || t.status) + '</span>' +
+      (responsavel ? '<span><i class="fas fa-user"></i> ' + responsavel.split(' ')[0] + '</span>' : '') +
+      prazoInfo +
+      checklistInfo +
+    '</div>' +
+  '</div>';
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Drag & Drop ──
+let draggedTarefaId = null;
+
+function onDragStartTarefa(e) {
+  draggedTarefaId = e.target.getAttribute('data-tarefa-id');
+  e.target.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function onDragOverColuna(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drag-over');
+}
+
+function onDragLeaveColuna(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+
+async function onDropTarefa(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (!draggedTarefaId) return;
+
+  const novoQuadroId = e.currentTarget.getAttribute('data-quadro-id');
+  const tarefa = planejadorState.tarefas.find(t => t.id === draggedTarefaId);
+  if (!tarefa || tarefa.quadro_id === novoQuadroId) { draggedTarefaId = null; return; }
+
+  // Atualiza localmente para feedback imediato
+  tarefa.quadro_id = novoQuadroId;
+  renderizarKanban();
+
+  // Salva no backend
+  const resp = await apiPost('tarefas.editar', { id: draggedTarefaId, quadro_id: novoQuadroId });
+  if (!resp.sucesso) {
+    toast('Erro ao mover tarefa: ' + resp.mensagem, 'erro');
+    carregarPlanejador();
+  }
+  draggedTarefaId = null;
+}
+
+// ── Filtros ──
+function aplicarFiltrosPlanejador() {
+  planejadorState.filtroResponsavel = document.getElementById('plan-filtro-responsavel').value;
+  planejadorState.filtroPrioridade = document.getElementById('plan-filtro-prioridade').value;
+  planejadorState.filtroStatus = document.getElementById('plan-filtro-status').value;
+  renderizarKanban();
+}
+
+function limparFiltrosPlanejador() {
+  document.getElementById('plan-filtro-responsavel').value = '';
+  document.getElementById('plan-filtro-prioridade').value = '';
+  document.getElementById('plan-filtro-status').value = '';
+  planejadorState.filtroResponsavel = '';
+  planejadorState.filtroPrioridade = '';
+  planejadorState.filtroStatus = '';
+  renderizarKanban();
+}
+
+// ── Modal Quadro (Criar / Editar) ──
+function abrirModalQuadro(id) {
+  document.getElementById('form-quadro').reset();
+  document.getElementById('form-quadro-id').value = '';
+  document.getElementById('modal-quadro-titulo').textContent = id ? 'Editar Quadro' : 'Novo Quadro';
+
+  if (id) {
+    const q = planejadorState.quadros.find(x => x.id === id);
+    if (q) {
+      document.getElementById('form-quadro-id').value = q.id;
+      document.getElementById('form-quadro-nome').value = q.nome;
+      document.getElementById('form-quadro-descricao').value = q.descricao || '';
+      document.getElementById('form-quadro-cor').value = q.cor || '#3498db';
+    }
+  }
+  document.getElementById('modal-quadro').classList.add('visivel');
+}
+
+function editarQuadroModal(id) { abrirModalQuadro(id); }
+
+function fecharModalQuadro() {
+  document.getElementById('modal-quadro').classList.remove('visivel');
+}
+
+async function salvarQuadro() {
+  const id = document.getElementById('form-quadro-id').value;
+  const nome = document.getElementById('form-quadro-nome').value.trim();
+  const descricao = document.getElementById('form-quadro-descricao').value.trim();
+  const cor = document.getElementById('form-quadro-cor').value;
+
+  if (!nome) { toast('Nome do quadro é obrigatório.', 'erro'); return; }
+
+  mostrarLoading();
+  let resp;
+  if (id) {
+    resp = await apiPost('quadros.editar', { id, nome, descricao, cor });
+  } else {
+    resp = await apiPost('quadros.criar', { nome, descricao, cor });
+  }
+  esconderLoading();
+
+  if (resp.sucesso) {
+    toast(resp.mensagem, 'sucesso');
+    fecharModalQuadro();
+    carregarPlanejador();
+  } else {
+    toast(resp.mensagem, 'erro');
+  }
+}
+
+function excluirQuadroConfirmar(id, nome) {
+  if (confirm('Excluir o quadro "' + nome + '" e TODAS as suas tarefas?\nEsta ação pode ser revertida pelo administrador.')) {
+    excluirQuadroExecutar(id);
+  }
+}
+
+async function excluirQuadroExecutar(id) {
+  mostrarLoading();
+  const resp = await apiPost('quadros.excluir', { id });
+  esconderLoading();
+  if (resp.sucesso) {
+    toast(resp.mensagem, 'sucesso');
+    carregarPlanejador();
+  } else { toast(resp.mensagem, 'erro'); }
+}
+
+// ── Modal Tarefa (Criar / Editar) ──
+async function abrirModalTarefa(id, quadroId) {
+  planejadorState.editandoTarefaId = id || null;
+  planejadorState.checklistTemp = [];
+  document.getElementById('form-tarefa').reset();
+  document.getElementById('form-tarefa-id').value = '';
+  document.getElementById('form-tarefa-quadro-id').value = quadroId || '';
+  document.getElementById('modal-tarefa-titulo').textContent = id ? 'Editar Tarefa' : 'Nova Tarefa';
+
+  // Popula dropdown de responsáveis
+  const selResp = document.getElementById('form-tarefa-responsavel');
+  selResp.innerHTML = '<option value="">Sem responsável</option>';
+  Object.keys(planejadorState.usuariosMap).forEach(uid => {
+    selResp.innerHTML += '<option value="' + uid + '">' + planejadorState.usuariosMap[uid] + '</option>';
+  });
+
+  // Popula dropdown de quadros
+  const selQuadro = document.getElementById('form-tarefa-quadro');
+  selQuadro.innerHTML = '';
+  planejadorState.quadros.forEach(q => {
+    const sel = q.id === quadroId ? ' selected' : '';
+    selQuadro.innerHTML += '<option value="' + q.id + '"' + sel + '>' + escapeHtml(q.nome) + '</option>';
+  });
+
+  // Botão de excluir
+  const btnExcluir = document.getElementById('btn-excluir-tarefa');
+  if (btnExcluir) btnExcluir.style.display = id && temPermissao('tarefas.excluir') ? '' : 'none';
+
+  if (id) {
+    // Carrega dados da tarefa
+    const tarefa = planejadorState.tarefas.find(t => t.id === id);
+    if (tarefa) {
+      document.getElementById('form-tarefa-id').value = tarefa.id;
+      document.getElementById('form-tarefa-quadro').value = tarefa.quadro_id;
+      document.getElementById('form-tarefa-titulo-input').value = tarefa.titulo || '';
+      document.getElementById('form-tarefa-descricao').value = tarefa.descricao || '';
+      document.getElementById('form-tarefa-responsavel').value = tarefa.responsavel_id || '';
+      document.getElementById('form-tarefa-prioridade').value = tarefa.prioridade || 'media';
+      document.getElementById('form-tarefa-status').value = tarefa.status || 'pendente';
+      document.getElementById('form-tarefa-data-inicio').value = (tarefa.data_inicio||'').substring(0,10);
+      document.getElementById('form-tarefa-data-prazo').value = (tarefa.data_prazo||'').substring(0,10);
+
+      // Checklist
+      try {
+        planejadorState.checklistTemp = JSON.parse(tarefa.checklist || '[]');
+      } catch(e) { planejadorState.checklistTemp = []; }
+    }
+  }
+
+  renderizarChecklistModal();
+  document.getElementById('modal-tarefa').classList.add('visivel');
+}
+
+function fecharModalTarefa() {
+  document.getElementById('modal-tarefa').classList.remove('visivel');
+  planejadorState.editandoTarefaId = null;
+}
+
+async function salvarTarefa() {
+  const id = document.getElementById('form-tarefa-id').value;
+  const dados = {
+    quadro_id: document.getElementById('form-tarefa-quadro').value,
+    titulo: document.getElementById('form-tarefa-titulo-input').value.trim(),
+    descricao: document.getElementById('form-tarefa-descricao').value.trim(),
+    responsavel_id: document.getElementById('form-tarefa-responsavel').value,
+    prioridade: document.getElementById('form-tarefa-prioridade').value,
+    status: document.getElementById('form-tarefa-status').value,
+    data_inicio: document.getElementById('form-tarefa-data-inicio').value,
+    data_prazo: document.getElementById('form-tarefa-data-prazo').value,
+    checklist: JSON.stringify(planejadorState.checklistTemp)
+  };
+
+  if (!dados.titulo) { toast('Título é obrigatório.', 'erro'); return; }
+  if (!dados.quadro_id) { toast('Quadro é obrigatório.', 'erro'); return; }
+
+  mostrarLoading();
+  let resp;
+  if (id) {
+    dados.id = id;
+    resp = await apiPost('tarefas.editar', dados);
+  } else {
+    resp = await apiPost('tarefas.criar', dados);
+  }
+  esconderLoading();
+
+  if (resp.sucesso) {
+    toast(resp.mensagem, 'sucesso');
+    fecharModalTarefa();
+    carregarPlanejador();
+  } else { toast(resp.mensagem, 'erro'); }
+}
+
+function excluirTarefaConfirmar() {
+  const id = document.getElementById('form-tarefa-id').value;
+  if (!id) return;
+  if (confirm('Excluir esta tarefa?')) {
+    excluirTarefaExecutar(id);
+  }
+}
+
+async function excluirTarefaExecutar(id) {
+  mostrarLoading();
+  const resp = await apiPost('tarefas.excluir', { id });
+  esconderLoading();
+  if (resp.sucesso) {
+    toast(resp.mensagem, 'sucesso');
+    fecharModalTarefa();
+    carregarPlanejador();
+  } else { toast(resp.mensagem, 'erro'); }
+}
+
+// ── Checklist ──
+function renderizarChecklistModal() {
+  const container = document.getElementById('checklist-container');
+  if (!container) return;
+  let html = '';
+  planejadorState.checklistTemp.forEach((item, idx) => {
+    const checked = item.feito ? 'checked' : '';
+    const classe = item.feito ? 'feito' : '';
+    html += '<div class="checklist-item ' + classe + '">' +
+      '<input type="checkbox" ' + checked + ' onchange="toggleChecklistItem(' + idx + ')">' +
+      '<span>' + escapeHtml(item.item) + '</span>' +
+      '<button onclick="removerChecklistItem(' + idx + ')" style="background:none;border:none;color:var(--cor-perigo);cursor:pointer;padding:2px 6px;font-size:12px;margin-left:auto;"><i class="fas fa-times"></i></button>' +
+    '</div>';
+  });
+  html += '<div class="checklist-input-row">' +
+    '<input type="text" id="checklist-novo-item" placeholder="Novo item..." onkeypress="if(event.key===\'Enter\')adicionarChecklistItem()">' +
+    '<button class="btn btn-outline" style="padding:6px 12px;font-size:12px;" onclick="adicionarChecklistItem()"><i class="fas fa-plus"></i></button>' +
+  '</div>';
+  container.innerHTML = html;
+}
+
+function adicionarChecklistItem() {
+  const input = document.getElementById('checklist-novo-item');
+  const texto = input.value.trim();
+  if (!texto) return;
+  planejadorState.checklistTemp.push({ item: texto, feito: false });
+  input.value = '';
+  renderizarChecklistModal();
+}
+
+function toggleChecklistItem(idx) {
+  planejadorState.checklistTemp[idx].feito = !planejadorState.checklistTemp[idx].feito;
+  renderizarChecklistModal();
+}
+
+function removerChecklistItem(idx) {
+  planejadorState.checklistTemp.splice(idx, 1);
+  renderizarChecklistModal();
+}
+
+// ── Inicialização ──
+function inicializarModuloPlanejador() {
+  carregarPlanejador();
+}
+
+    
+// ============================================================
+// AGENDA — Calendário visual com CRUD de eventos
+// ============================================================
+
+let agendaState = {
+  eventos: [],
+  mesAtual: new Date().getMonth(),
+  anoAtual: new Date().getFullYear(),
+  vista: 'calendario',
+  editandoId: null,
+  filtroTipo: '',
+  filtroStatus: ''
+};
+
+const MESES_NOMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DIAS_SEMANA = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const TIPO_CORES = { comicio:'comicio', reuniao:'reuniao', visita:'visita', entrevista:'entrevista', outro:'outro' };
+const TIPO_LABEL = { comicio:'Comício', reuniao:'Reunião', visita:'Visita', entrevista:'Entrevista', outro:'Outro' };
+const STATUS_LABEL = { confirmado:'Confirmado', pendente:'Pendente', cancelado:'Cancelado' };
+
+async function carregarAgenda() {
+  const mesStr = agendaState.anoAtual + '-' + String(agendaState.mesAtual + 1).padStart(2,'0');
+  const resp = await apiPost('agenda.listar', {
+    mes: mesStr,
+    tipo: agendaState.filtroTipo,
+    status: agendaState.filtroStatus
+  });
+  if (resp.sucesso) {
+    agendaState.eventos = resp.dados.registros || [];
+  } else {
+    toast(resp.mensagem, 'erro');
+  }
+  if (agendaState.vista === 'calendario') {
+    renderizarCalendario();
+  } else {
+    renderizarListaAgenda();
+  }
+  document.getElementById('agenda-mes-titulo').textContent = MESES_NOMES[agendaState.mesAtual] + ' ' + agendaState.anoAtual;
+}
+
+function mesAnterior() {
+  agendaState.mesAtual--;
+  if (agendaState.mesAtual < 0) { agendaState.mesAtual = 11; agendaState.anoAtual--; }
+  carregarAgenda();
+}
+
+function mesSeguinte() {
+  agendaState.mesAtual++;
+  if (agendaState.mesAtual > 11) { agendaState.mesAtual = 0; agendaState.anoAtual++; }
+  carregarAgenda();
+}
+
+function irParaHoje() {
+  agendaState.mesAtual = new Date().getMonth();
+  agendaState.anoAtual = new Date().getFullYear();
+  carregarAgenda();
+}
+
+function alternarVistaAgenda(vista) {
+  agendaState.vista = vista;
+  document.getElementById('btn-vista-calendario').classList.toggle('btn-primario', vista === 'calendario');
+  document.getElementById('btn-vista-calendario').classList.toggle('btn-outline', vista !== 'calendario');
+  document.getElementById('btn-vista-lista').classList.toggle('btn-primario', vista === 'lista');
+  document.getElementById('btn-vista-lista').classList.toggle('btn-outline', vista !== 'lista');
+  document.getElementById('calendario-container').style.display = vista === 'calendario' ? 'block' : 'none';
+  document.getElementById('agenda-lista-container').style.display = vista === 'lista' ? 'block' : 'none';
+  if (vista === 'lista') renderizarListaAgenda();
+  else renderizarCalendario();
+}
+
+function aplicarFiltrosAgenda() {
+  agendaState.filtroTipo = document.getElementById('agenda-filtro-tipo').value;
+  agendaState.filtroStatus = document.getElementById('agenda-filtro-status').value;
+  carregarAgenda();
+}
+
+function renderizarCalendario() {
+  const ano = agendaState.anoAtual;
+  const mes = agendaState.mesAtual;
+  const primeiroDia = new Date(ano, mes, 1).getDay();
+  const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+  const diasMesAnterior = new Date(ano, mes, 0).getDate();
+  const hoje = new Date();
+  const hojeStr = hoje.getFullYear() + '-' + String(hoje.getMonth()+1).padStart(2,'0') + '-' + String(hoje.getDate()).padStart(2,'0');
+
+  let html = '';
+
+  // Dias do mês anterior (preenchimento)
+  for (let i = primeiroDia - 1; i >= 0; i--) {
+    const d = diasMesAnterior - i;
+    html += '<div class="calendario-dia outro-mes"><span class="dia-numero">' + d + '</span></div>';
+  }
+
+  // Dias do mês atual
+  for (let d = 1; d <= diasNoMes; d++) {
+    const dataStr = ano + '-' + String(mes+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const ehHoje = dataStr === hojeStr;
+    const eventosNoDia = agendaState.eventos.filter(e => (e.data||'').substring(0,10) === dataStr);
+
+    html += '<div class="calendario-dia' + (ehHoje ? ' hoje' : '') + '" onclick="onClickDiaCalendario(\'' + dataStr + '\')">';
+    html += '<span class="dia-numero">' + d + '</span>';
+
+    const maxChips = 3;
+    eventosNoDia.slice(0, maxChips).forEach(ev => {
+      const tipo = ev.tipo || 'outro';
+      const hora = ev.hora_inicio ? ev.hora_inicio.substring(0,5) + ' ' : '';
+      html += '<div class="evento-chip ' + tipo + '" onclick="event.stopPropagation();abrirModalEvento(\'' + ev.id + '\')" title="' + escapeHtml(ev.titulo) + '">' + hora + escapeHtml(ev.titulo) + '</div>';
+    });
+    if (eventosNoDia.length > maxChips) {
+      html += '<div class="evento-chip-mais" onclick="event.stopPropagation();verEventosDoDia(\'' + dataStr + '\')">+' + (eventosNoDia.length - maxChips) + ' mais</div>';
+    }
+
+    html += '</div>';
+  }
+
+  // Dias do próximo mês (preenchimento até completar grid)
+  const totalCells = primeiroDia + diasNoMes;
+  const resto = totalCells % 7;
+  if (resto > 0) {
+    for (let i = 1; i <= 7 - resto; i++) {
+      html += '<div class="calendario-dia outro-mes"><span class="dia-numero">' + i + '</span></div>';
+    }
+  }
+
+  document.getElementById('calendario-body').innerHTML = html;
+}
+
+function renderizarListaAgenda() {
+  const container = document.getElementById('agenda-lista-conteudo');
+  const eventos = agendaState.eventos.slice().sort((a,b) => ((a.data||'')+(a.hora_inicio||'')).localeCompare((b.data||'')+(b.hora_inicio||'')));
+
+  if (eventos.length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:var(--cor-texto-secundario);padding:40px;">Nenhum evento neste mês.</p>';
+    return;
+  }
+
+  container.innerHTML = eventos.map(ev => {
+    const tipo = ev.tipo || 'outro';
+    const dt = new Date(ev.data + 'T00:00:00');
+    const dia = dt.getDate();
+    const mesAbrev = MESES_NOMES[dt.getMonth()].substring(0,3);
+    const horario = (ev.hora_inicio || '') + (ev.hora_fim ? ' — ' + ev.hora_fim : '');
+    const statusBadge = { confirmado:'badge-verde', pendente:'badge-laranja', cancelado:'badge-vermelho' };
+
+    return '<div class="agenda-lista-item ' + tipo + '">' +
+      '<div class="evento-data-col"><div class="dia">' + dia + '</div><div class="mes-ano">' + mesAbrev + ' ' + agendaState.anoAtual + '</div></div>' +
+      '<div class="evento-info">' +
+        '<h3>' + escapeHtml(ev.titulo) + '</h3>' +
+        '<div class="evento-detalhe">' +
+          (horario ? '<span><i class="fas fa-clock"></i> ' + horario + '</span>' : '') +
+          (ev.local ? '<span><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(ev.local) + '</span>' : '') +
+          (ev.municipio ? '<span><i class="fas fa-city"></i> ' + ev.municipio + (ev.estado ? '/' + ev.estado : '') + '</span>' : '') +
+          '<span class="badge ' + (statusBadge[ev.status]||'badge-cinza') + '">' + (STATUS_LABEL[ev.status]||ev.status) + '</span>' +
+          '<span class="badge ' + ({'comicio':'badge-vermelho','reuniao':'badge-azul','visita':'badge-verde','entrevista':'badge-laranja'}[tipo]||'badge-cinza') + '">' + (TIPO_LABEL[tipo]||tipo) + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="evento-acoes">' +
+        (temPermissao('agenda.criar') ? '<button class="btn btn-outline" style="padding:5px 10px;font-size:12px;" onclick="abrirModalEvento(\'' + ev.id + '\')" title="Editar"><i class="fas fa-edit"></i></button>' : '') +
+        (temPermissao('agenda.excluir') ? '<button class="btn btn-outline" style="padding:5px 10px;font-size:12px;color:var(--cor-perigo);border-color:var(--cor-perigo);" onclick="excluirEventoConfirmar(\'' + ev.id + '\',\'' + escapeHtml(ev.titulo).replace(/'/g,'') + '\')" title="Excluir"><i class="fas fa-trash"></i></button>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function onClickDiaCalendario(dataStr) {
+  if (temPermissao('agenda.criar')) {
+    abrirModalEvento(null, dataStr);
+  } else {
+    verEventosDoDia(dataStr);
+  }
+}
+
+function verEventosDoDia(dataStr) {
+  const eventos = agendaState.eventos.filter(e => (e.data||'').substring(0,10) === dataStr);
+  if (eventos.length === 0) { toast('Nenhum evento neste dia.', 'info'); return; }
+  // Muda para vista lista mostrando apenas este dia
+  alternarVistaAgenda('lista');
+  const container = document.getElementById('agenda-lista-conteudo');
+  // Re-renderiza só com eventos desse dia
+  const bkp = agendaState.eventos;
+  agendaState.eventos = eventos;
+  renderizarListaAgenda();
+  agendaState.eventos = bkp;
+}
+
+// ── Modal Evento ──
+async function abrirModalEvento(id, dataPadrao) {
+  agendaState.editandoId = id || null;
+  document.getElementById('form-evento').reset();
+  document.getElementById('form-evento-id').value = '';
+  document.getElementById('modal-evento-titulo').textContent = id ? 'Editar Evento' : 'Novo Evento';
+
+  const btnExcluir = document.getElementById('btn-excluir-evento');
+  if (btnExcluir) btnExcluir.style.display = id && temPermissao('agenda.excluir') ? '' : 'none';
+
+  // Popula dropdowns estado/município
+  await popularDropdownEstados('form-evento-estado');
+  const selMun = document.getElementById('form-evento-municipio');
+  selMun.innerHTML = '<option value="">Selecione um estado primeiro</option>';
+  selMun.disabled = true;
+
+  if (dataPadrao && !id) {
+    document.getElementById('form-evento-data').value = dataPadrao;
+  }
+
+  if (id) {
+    const ev = agendaState.eventos.find(e => e.id === id);
+    if (ev) {
+      document.getElementById('form-evento-id').value = ev.id;
+      document.getElementById('form-evento-titulo-input').value = ev.titulo || '';
+      document.getElementById('form-evento-descricao').value = ev.descricao || '';
+      document.getElementById('form-evento-data').value = (ev.data||'').substring(0,10);
+      document.getElementById('form-evento-hora-inicio').value = (ev.hora_inicio||'').substring(0,5);
+      document.getElementById('form-evento-hora-fim').value = (ev.hora_fim||'').substring(0,5);
+      document.getElementById('form-evento-local').value = ev.local || '';
+      document.getElementById('form-evento-tipo').value = ev.tipo || 'outro';
+      document.getElementById('form-evento-status').value = ev.status || 'pendente';
+
+      if (ev.estado) {
+        await popularDropdownEstados('form-evento-estado', ev.estado);
+        await carregarMunicipiosDropdown('form-evento-municipio', ev.estado, ev.municipio);
+      }
+    }
+  }
+
+  document.getElementById('modal-evento').classList.add('visivel');
+}
+
+function fecharModalEvento() {
+  document.getElementById('modal-evento').classList.remove('visivel');
+  agendaState.editandoId = null;
+}
+
+async function onFormEventoEstadoChange() {
+  const sigla = document.getElementById('form-evento-estado').value;
+  await carregarMunicipiosDropdown('form-evento-municipio', sigla);
+}
+
+async function salvarEvento() {
+  const id = document.getElementById('form-evento-id').value;
+  const dados = {
+    titulo: document.getElementById('form-evento-titulo-input').value.trim(),
+    descricao: document.getElementById('form-evento-descricao').value.trim(),
+    data: document.getElementById('form-evento-data').value,
+    hora_inicio: document.getElementById('form-evento-hora-inicio').value,
+    hora_fim: document.getElementById('form-evento-hora-fim').value,
+    local: document.getElementById('form-evento-local').value.trim(),
+    estado: document.getElementById('form-evento-estado').value,
+    municipio: document.getElementById('form-evento-municipio').value,
+    tipo: document.getElementById('form-evento-tipo').value,
+    status: document.getElementById('form-evento-status').value
+  };
+
+  if (!dados.titulo) { toast('Título é obrigatório.', 'erro'); return; }
+  if (!dados.data) { toast('Data é obrigatória.', 'erro'); return; }
+
+  mostrarLoading();
+  let resp;
+  if (id) {
+    dados.id = id;
+    resp = await apiPost('agenda.editar', dados);
+  } else {
+    resp = await apiPost('agenda.criar', dados);
+  }
+  esconderLoading();
+
+  if (resp.sucesso) {
+    toast(resp.mensagem, 'sucesso');
+    fecharModalEvento();
+    carregarAgenda();
+  } else {
+    toast(resp.mensagem, 'erro');
+  }
+}
+
+function excluirEventoConfirmar(id, nome) {
+  if (confirm('Excluir o evento "' + nome + '"?')) {
+    excluirEventoExecutar(id);
+  }
+}
+
+async function excluirEventoExecutar(id) {
+  mostrarLoading();
+  const resp = await apiPost('agenda.excluir', { id });
+  esconderLoading();
+  if (resp.sucesso) {
+    toast(resp.mensagem, 'sucesso');
+    fecharModalEvento();
+    carregarAgenda();
+  } else { toast(resp.mensagem, 'erro'); }
+}
+
+function inicializarModuloAgenda() {
+  carregarAgenda();
+}
+
+    
+// ============================================================
+// DASHBOARDS — Gráficos Plotly.js (Contatos + Planejador)
+// ============================================================
+
+let dashState = { abaAtiva: 'contatos' };
+
+const PLOTLY_LAYOUT_BASE = {
+  font: { family: 'Segoe UI, sans-serif', size: 12, color: '#1e293b' },
+  paper_bgcolor: 'transparent',
+  plot_bgcolor: 'transparent',
+  margin: { t: 40, r: 20, b: 40, l: 50 },
+  autosize: true
+};
+
+const PLOTLY_CONFIG = { responsive: true, displayModeBar: false };
+
+const CORES_PADRAO = ['#1a56db','#059669','#d97706','#dc2626','#7c3aed','#0891b2','#be185d','#65a30d','#ea580c','#4f46e5'];
+
+function inicializarModuloDashboards() {
+  trocarAbaDash('contatos');
+}
+
+function trocarAbaDash(aba) {
+  dashState.abaAtiva = aba;
+  document.getElementById('dash-tab-contatos').classList.toggle('btn-primario', aba === 'contatos');
+  document.getElementById('dash-tab-contatos').classList.toggle('btn-outline', aba !== 'contatos');
+  document.getElementById('dash-tab-planejador').classList.toggle('btn-primario', aba === 'planejador');
+  document.getElementById('dash-tab-planejador').classList.toggle('btn-outline', aba !== 'planejador');
+  document.getElementById('dash-painel-contatos').style.display = aba === 'contatos' ? 'block' : 'none';
+  document.getElementById('dash-painel-planejador').style.display = aba === 'planejador' ? 'block' : 'none';
+
+  if (aba === 'contatos') carregarDashContatos();
+  else carregarDashPlanejador();
+}
+
+// ════════════════════════════════════════════
+// DASHBOARD DE CONTATOS
+// ════════════════════════════════════════════
+
+async function carregarDashContatos() {
+  document.getElementById('dash-contatos-loading').style.display = 'flex';
+  const resp = await apiPost('dashboard.contatos');
+  document.getElementById('dash-contatos-loading').style.display = 'none';
+
+  if (!resp.sucesso) { toast(resp.mensagem, 'erro'); return; }
+  const d = resp.dados;
+
+  // KPIs
+  document.getElementById('dash-kpi-total').textContent = (d.total || 0).toLocaleString('pt-BR');
+  document.getElementById('dash-kpi-mes').textContent = (d.cadastros_mes || 0).toLocaleString('pt-BR');
+  document.getElementById('dash-kpi-semana').textContent = (d.cadastros_semana || 0).toLocaleString('pt-BR');
+
+  // Gráfico: Contatos por categoria (pizza)
+  if (d.por_categoria && d.por_categoria.length > 0) {
+    const labels = d.por_categoria.map(i => i.valor);
+    const values = d.por_categoria.map(i => i.quantidade);
+    Plotly.newPlot('grafico-categoria', [{
+      type: 'pie', labels: labels, values: values,
+      marker: { colors: CORES_PADRAO },
+      textinfo: 'label+percent', hole: 0.4
+    }], { ...PLOTLY_LAYOUT_BASE, title: 'Contatos por Categoria', margin: { t: 50, r: 10, b: 10, l: 10 } }, PLOTLY_CONFIG);
+  }
+
+  // Gráfico: Contatos por estado (barras verticais)
+  if (d.por_estado && d.por_estado.length > 0) {
+    const sorted = d.por_estado.slice().sort((a,b) => b.quantidade - a.quantidade);
+    Plotly.newPlot('grafico-estado', [{
+      type: 'bar', x: sorted.map(i => i.valor), y: sorted.map(i => i.quantidade),
+      marker: { color: '#1a56db' }
+    }], { ...PLOTLY_LAYOUT_BASE, title: 'Contatos por Estado', xaxis: { title: '' }, yaxis: { title: 'Contatos' } }, PLOTLY_CONFIG);
+  }
+
+  // Gráfico: Top 20 municípios (barras horizontais)
+  if (d.top_20_municipios && d.top_20_municipios.length > 0) {
+    const rev = d.top_20_municipios.slice().reverse();
+    Plotly.newPlot('grafico-municipio', [{
+      type: 'bar', y: rev.map(i => i.valor), x: rev.map(i => i.quantidade),
+      orientation: 'h', marker: { color: '#059669' }
+    }], { ...PLOTLY_LAYOUT_BASE, title: 'Top 20 Municípios', margin: { t: 40, r: 20, b: 40, l: 140 }, yaxis: { automargin: true } }, PLOTLY_CONFIG);
+  }
+
+  // Gráfico: Evolução de cadastros (linha)
+  if (d.evolucao_acumulada && d.evolucao_acumulada.length > 0) {
+    Plotly.newPlot('grafico-evolucao', [{
+      type: 'scatter', mode: 'lines+markers',
+      x: d.evolucao_acumulada.map(i => i.data), y: d.evolucao_acumulada.map(i => i.total),
+      line: { color: '#1a56db', width: 2 }, marker: { size: 4 },
+      fill: 'tozeroy', fillcolor: 'rgba(26,86,219,0.08)'
+    }], { ...PLOTLY_LAYOUT_BASE, title: 'Evolução Acumulada de Cadastros', xaxis: { title: '' }, yaxis: { title: 'Total' } }, PLOTLY_CONFIG);
+  }
+
+  // Gráfico: Faixa etária (barras)
+  if (d.faixas_etarias && d.faixas_etarias.length > 0) {
+    const faixas = d.faixas_etarias.filter(f => f.faixa !== 'Não informado');
+    Plotly.newPlot('grafico-faixa-etaria', [{
+      type: 'bar', x: faixas.map(i => i.faixa), y: faixas.map(i => i.quantidade),
+      marker: { color: '#7c3aed' }
+    }], { ...PLOTLY_LAYOUT_BASE, title: 'Faixa Etária', xaxis: { title: '' }, yaxis: { title: 'Contatos' } }, PLOTLY_CONFIG);
+  }
+
+  // Gráfico: Taxa de preenchimento (barras horizontais)
+  if (d.taxa_preenchimento && d.taxa_preenchimento.length > 0) {
+    const campoNomes = { cpf: 'CPF', email: 'E-mail', data_nascimento: 'Nascimento', cep: 'CEP', observacoes: 'Observações', foto_url: 'Foto' };
+    const rev = d.taxa_preenchimento.slice().reverse();
+    Plotly.newPlot('grafico-preenchimento', [{
+      type: 'bar', y: rev.map(i => campoNomes[i.campo] || i.campo), x: rev.map(i => i.percentual),
+      orientation: 'h', marker: { color: '#0891b2' },
+      text: rev.map(i => i.percentual + '%'), textposition: 'outside'
+    }], { ...PLOTLY_LAYOUT_BASE, title: 'Taxa de Preenchimento (%)', margin: { t: 40, r: 40, b: 40, l: 100 }, xaxis: { range: [0, 105], title: '' } }, PLOTLY_CONFIG);
+  }
+
+  // Gráfico: Top 10 operadores (barras horizontais)
+  if (d.top_10_operadores && d.top_10_operadores.length > 0) {
+    const rev = d.top_10_operadores.slice().reverse();
+    Plotly.newPlot('grafico-operadores', [{
+      type: 'bar', y: rev.map(i => i.nome), x: rev.map(i => i.quantidade),
+      orientation: 'h', marker: { color: '#be185d' }
+    }], { ...PLOTLY_LAYOUT_BASE, title: 'Top 10 Operadores', margin: { t: 40, r: 20, b: 40, l: 140 }, yaxis: { automargin: true } }, PLOTLY_CONFIG);
+  }
+}
+
+// ════════════════════════════════════════════
+// DASHBOARD DO PLANEJADOR
+// ════════════════════════════════════════════
+
+async function carregarDashPlanejador() {
+  document.getElementById('dash-planejador-loading').style.display = 'flex';
+  const resp = await apiPost('dashboard.planejador');
+  document.getElementById('dash-planejador-loading').style.display = 'none';
+
+  if (!resp.sucesso) { toast(resp.mensagem, 'erro'); return; }
+  const d = resp.dados;
+
+  // KPIs
+  document.getElementById('dash-kpi-tarefas-total').textContent = (d.total || 0).toLocaleString('pt-BR');
+  document.getElementById('dash-kpi-atrasadas').textContent = (d.total_atrasadas || 0).toLocaleString('pt-BR');
+  document.getElementById('dash-kpi-prazo-medio').textContent = (d.prazo_medio_dias || 0) + ' dias';
+
+  // Gráfico: Tarefas por status (pizza)
+  if (d.por_status && d.por_status.length > 0) {
+    const statusLabel = { pendente:'Pendente', em_andamento:'Em andamento', concluida:'Concluída', cancelada:'Cancelada' };
+    const statusCores = { pendente:'#64748b', em_andamento:'#2563eb', concluida:'#059669', cancelada:'#dc2626' };
+    Plotly.newPlot('grafico-tarefas-status', [{
+      type: 'pie',
+      labels: d.por_status.map(i => statusLabel[i.valor] || i.valor),
+      values: d.por_status.map(i => i.quantidade),
+      marker: { colors: d.por_status.map(i => statusCores[i.valor] || '#94a3b8') },
+      textinfo: 'label+percent', hole: 0.4
+    }], { ...PLOTLY_LAYOUT_BASE, title: 'Tarefas por Status', margin: { t: 50, r: 10, b: 10, l: 10 } }, PLOTLY_CONFIG);
+  }
+
+  // Gráfico: Tarefas por prioridade (barras)
+  if (d.por_prioridade && d.por_prioridade.length > 0) {
+    const prioLabel = { baixa:'Baixa', media:'Média', alta:'Alta', urgente:'Urgente' };
+    const prioCores = { baixa:'#059669', media:'#2563eb', alta:'#d97706', urgente:'#dc2626' };
+    const ordem = ['baixa','media','alta','urgente'];
+    const sorted = d.por_prioridade.slice().sort((a,b) => ordem.indexOf(a.valor) - ordem.indexOf(b.valor));
+    Plotly.newPlot('grafico-tarefas-prioridade', [{
+      type: 'bar',
+      x: sorted.map(i => prioLabel[i.valor] || i.valor),
+      y: sorted.map(i => i.quantidade),
+      marker: { color: sorted.map(i => prioCores[i.valor] || '#94a3b8') }
+    }], { ...PLOTLY_LAYOUT_BASE, title: 'Tarefas por Prioridade', xaxis: { title: '' }, yaxis: { title: 'Quantidade' } }, PLOTLY_CONFIG);
+  }
+
+  // Gráfico: Tarefas por quadro (barras empilhadas)
+  if (d.por_quadro && d.por_quadro.length > 0) {
+    const statusList = ['pendente','em_andamento','concluida','cancelada'];
+    const statusLabel = { pendente:'Pendente', em_andamento:'Em andamento', concluida:'Concluída', cancelada:'Cancelada' };
+    const statusCores = { pendente:'#64748b', em_andamento:'#2563eb', concluida:'#059669', cancelada:'#dc2626' };
+    const quadroNomes = d.por_quadro.map(q => q.quadro);
+    const traces = statusList.map(st => ({
+      type: 'bar', name: statusLabel[st],
+      x: quadroNomes,
+      y: d.por_quadro.map(q => (q.status && q.status[st]) || 0),
+      marker: { color: statusCores[st] }
+    }));
+    Plotly.newPlot('grafico-tarefas-quadro', traces, {
+      ...PLOTLY_LAYOUT_BASE, title: 'Tarefas por Quadro', barmode: 'stack',
+      xaxis: { title: '' }, yaxis: { title: 'Quantidade' }
+    }, PLOTLY_CONFIG);
+  }
+
+  // Gráfico: Carga por responsável (barras horizontais)
+  if (d.carga_responsavel && d.carga_responsavel.length > 0) {
+    const rev = d.carga_responsavel.slice().reverse();
+    Plotly.newPlot('grafico-carga-responsavel', [{
+      type: 'bar', y: rev.map(i => i.nome), x: rev.map(i => i.quantidade),
+      orientation: 'h', marker: { color: '#4f46e5' }
+    }], { ...PLOTLY_LAYOUT_BASE, title: 'Carga por Responsável', margin: { t: 40, r: 20, b: 40, l: 140 }, yaxis: { automargin: true } }, PLOTLY_CONFIG);
+  }
+
+  // Gráfico: Evolução de conclusões (linha acumulada)
+  if (d.evolucao_conclusoes && d.evolucao_conclusoes.length > 0) {
+    Plotly.newPlot('grafico-evolucao-conclusoes', [{
+      type: 'scatter', mode: 'lines+markers',
+      x: d.evolucao_conclusoes.map(i => i.data), y: d.evolucao_conclusoes.map(i => i.total),
+      line: { color: '#059669', width: 2 }, marker: { size: 4 },
+      fill: 'tozeroy', fillcolor: 'rgba(5,150,105,0.08)'
+    }], { ...PLOTLY_LAYOUT_BASE, title: 'Evolução de Conclusões', xaxis: { title: '' }, yaxis: { title: 'Total Concluídas' } }, PLOTLY_CONFIG);
+  }
+
+  // Lista de atrasadas
+  const listaEl = document.getElementById('dash-lista-atrasadas');
+  if (listaEl) {
+    if (d.atrasadas && d.atrasadas.length > 0) {
+      listaEl.innerHTML = '<table style="width:100%;"><thead><tr><th>Tarefa</th><th>Prazo</th><th>Prioridade</th><th>Quadro</th></tr></thead><tbody>' +
+        d.atrasadas.slice(0, 15).map(t => {
+          const prioBadge = { urgente:'badge-vermelho', alta:'badge-laranja', media:'badge-azul', baixa:'badge-verde' };
+          return '<tr><td>' + escapeHtml(t.titulo) + '</td><td>' + formatarData(t.data_prazo) + '</td><td><span class="badge ' + (prioBadge[t.prioridade]||'badge-cinza') + '">' + (t.prioridade||'') + '</span></td><td>' + escapeHtml(t.quadro) + '</td></tr>';
+        }).join('') +
+      '</tbody></table>';
+    } else {
+      listaEl.innerHTML = '<p style="text-align:center;color:var(--cor-texto-secundario);padding:20px;">Nenhuma tarefa atrasada! 🎉</p>';
+    }
+  }
+}
+
+    
+// ============================================================
+// ADMIN — Gestão de Usuários, Logs e Configurações
+// ============================================================
+
+let adminState = {
+  abaAtiva: 'usuarios',
+  usuarios: [],
+  logs: [],
+  configs: [],
+  logPagina: 1,
+  logTotal: 0,
+  logTotalPaginas: 0
+};
+
+function inicializarModuloAdmin() {
+  if (!temPermissao('admin')) {
+    toast('Acesso negado.', 'erro');
+    navegar('painel');
+    return;
+  }
+  trocarAbaAdmin('usuarios');
+}
+
+function trocarAbaAdmin(aba) {
+  adminState.abaAtiva = aba;
+  ['usuarios','logs','configs'].forEach(a => {
+    const tab = document.getElementById('admin-tab-' + a);
+    const painel = document.getElementById('admin-painel-' + a);
+    if (tab) { tab.classList.toggle('btn-primario', a === aba); tab.classList.toggle('btn-outline', a !== aba); }
+    if (painel) painel.style.display = a === aba ? 'block' : 'none';
+  });
+  if (aba === 'usuarios') carregarUsuariosAdmin();
+  else if (aba === 'logs') carregarLogs(1);
+  else if (aba === 'configs') carregarConfigs();
+}
+
+// ═══════ GESTÃO DE USUÁRIOS ═══════
+
+async function carregarUsuariosAdmin() {
+  const resp = await apiPost('usuarios.listar');
+  if (!resp.sucesso) { toast(resp.mensagem, 'erro'); return; }
+  adminState.usuarios = resp.dados || [];
+  renderizarTabelaUsuarios();
+}
+
+function renderizarTabelaUsuarios() {
+  const tbody = document.getElementById('admin-usuarios-body');
+  if (adminState.usuarios.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--cor-texto-secundario);">Nenhum usuário.</td></tr>';
+    return;
+  }
+  const nivelBadge = { admin:'badge-vermelho', coordenador:'badge-laranja', operador:'badge-azul', visualizador:'badge-cinza' };
+  tbody.innerHTML = adminState.usuarios.map(u => {
+    const ativoStr = (String(u.ativo).toUpperCase() === 'TRUE' || String(u.ativo) === '1');
+    return '<tr' + (!ativoStr ? ' style="opacity:0.5;"' : '') + '>' +
+      '<td><strong>' + escapeHtml(u.nome) + '</strong></td>' +
+      '<td>' + escapeHtml(u.email) + '</td>' +
+      '<td><span class="badge ' + (nivelBadge[u.nivel_acesso]||'badge-cinza') + '">' + (u.nivel_acesso||'') + '</span></td>' +
+      '<td>' + (ativoStr ? '<span style="color:var(--cor-secundaria);">● Ativo</span>' : '<span style="color:var(--cor-perigo);">● Inativo</span>') + '</td>' +
+      '<td>' + formatarDataHora(u.criado_em) + '</td>' +
+      '<td style="white-space:nowrap;">' +
+        '<button class="btn btn-outline" style="padding:5px 10px;font-size:12px;" onclick="abrirModalUsuario(\'' + u.id + '\')" title="Editar"><i class="fas fa-edit"></i></button> ' +
+        '<button class="btn btn-outline" style="padding:5px 10px;font-size:12px;" onclick="resetarSenhaConfirmar(\'' + u.id + '\',\'' + escapeHtml(u.nome).replace(/'/g,'') + '\')" title="Resetar senha"><i class="fas fa-key"></i></button> ' +
+        (ativoStr ?
+          '<button class="btn btn-outline" style="padding:5px 10px;font-size:12px;color:var(--cor-perigo);border-color:var(--cor-perigo);" onclick="desativarUsuarioConfirmar(\'' + u.id + '\',\'' + escapeHtml(u.nome).replace(/'/g,'') + '\')" title="Desativar"><i class="fas fa-ban"></i></button>'
+          : '') +
+      '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+function abrirModalUsuario(id) {
+  document.getElementById('form-usuario').reset();
+  document.getElementById('form-usuario-id').value = '';
+  document.getElementById('form-usuario-senha-group').style.display = 'block';
+  document.getElementById('modal-usuario-titulo').textContent = id ? 'Editar Usuário' : 'Novo Usuário';
+
+  if (id) {
+    const u = adminState.usuarios.find(x => x.id === id);
+    if (u) {
+      document.getElementById('form-usuario-id').value = u.id;
+      document.getElementById('form-usuario-nome').value = u.nome || '';
+      document.getElementById('form-usuario-email').value = u.email || '';
+      document.getElementById('form-usuario-nivel').value = u.nivel_acesso || 'operador';
+      document.getElementById('form-usuario-senha-group').style.display = 'none';
+    }
+  }
+  document.getElementById('modal-usuario').classList.add('visivel');
+}
+
+function fecharModalUsuario() {
+  document.getElementById('modal-usuario').classList.remove('visivel');
+}
+
+async function salvarUsuario() {
+  const id = document.getElementById('form-usuario-id').value;
+  const nome = document.getElementById('form-usuario-nome').value.trim();
+  const email = document.getElementById('form-usuario-email').value.trim().toLowerCase();
+  const nivel = document.getElementById('form-usuario-nivel').value;
+  const senha = document.getElementById('form-usuario-senha').value;
+
+  if (!nome || nome.length < 3) { toast('Nome é obrigatório (mín. 3 caracteres).', 'erro'); return; }
+  if (!email || !validarEmail(email)) { toast('E-mail inválido.', 'erro'); return; }
+  if (!nivel) { toast('Nível de acesso é obrigatório.', 'erro'); return; }
+  if (!id && (!senha || senha.length < 6)) { toast('Senha é obrigatória (mín. 6 caracteres).', 'erro'); return; }
+
+  mostrarLoading();
+  let resp;
+  if (id) {
+    resp = await apiPost('usuarios.editar', { id, nome, email, nivel_acesso: nivel });
+  } else {
+    resp = await apiPost('usuarios.criar', { nome, email, nivel_acesso: nivel, senha });
+  }
+  esconderLoading();
+
+  if (resp.sucesso) {
+    toast(resp.mensagem, 'sucesso');
+    fecharModalUsuario();
+    carregarUsuariosAdmin();
+  } else { toast(resp.mensagem, 'erro'); }
+}
+
+function resetarSenhaConfirmar(id, nome) {
+  const novaSenha = prompt('Nova senha para "' + nome + '" (mín. 6 caracteres):');
+  if (!novaSenha) return;
+  if (novaSenha.length < 6) { toast('Senha deve ter no mínimo 6 caracteres.', 'erro'); return; }
+  resetarSenhaExecutar(id, novaSenha);
+}
+
+async function resetarSenhaExecutar(id, novaSenha) {
+  mostrarLoading();
+  const resp = await apiPost('usuarios.resetar_senha', { id, nova_senha: novaSenha });
+  esconderLoading();
+  if (resp.sucesso) { toast(resp.mensagem, 'sucesso'); }
+  else { toast(resp.mensagem, 'erro'); }
+}
+
+function desativarUsuarioConfirmar(id, nome) {
+  if (confirm('Desativar o usuário "' + nome + '"?\nO usuário não poderá mais fazer login.')) {
+    desativarUsuarioExecutar(id);
+  }
+}
+
+async function desativarUsuarioExecutar(id) {
+  mostrarLoading();
+  const resp = await apiPost('usuarios.desativar', { id });
+  esconderLoading();
+  if (resp.sucesso) { toast(resp.mensagem, 'sucesso'); carregarUsuariosAdmin(); }
+  else { toast(resp.mensagem, 'erro'); }
+}
+
+// ═══════ LOG DE ATIVIDADES ═══════
+
+async function carregarLogs(pagina) {
+  adminState.logPagina = pagina || 1;
+  const filtros = {
+    pagina: adminState.logPagina,
+    por_pagina: 20,
+    usuario_id: document.getElementById('log-filtro-usuario') ? document.getElementById('log-filtro-usuario').value : '',
+    acao: document.getElementById('log-filtro-acao') ? document.getElementById('log-filtro-acao').value : '',
+    entidade: document.getElementById('log-filtro-entidade') ? document.getElementById('log-filtro-entidade').value : ''
+  };
+
+  const resp = await apiPost('log.listar', filtros);
+  if (!resp.sucesso) { toast(resp.mensagem, 'erro'); return; }
+
+  adminState.logs = resp.dados.registros || [];
+  adminState.logTotal = resp.dados.total || 0;
+  adminState.logTotalPaginas = resp.dados.total_paginas || 0;
+
+  // Popula filtro de usuários se vazio
+  const selUsuario = document.getElementById('log-filtro-usuario');
+  if (selUsuario && selUsuario.options.length <= 1) {
+    adminState.usuarios.forEach(u => {
+      const opt = document.createElement('option');
+      opt.value = u.id;
+      opt.textContent = u.nome;
+      selUsuario.appendChild(opt);
+    });
+  }
+
+  renderizarTabelaLogs();
+  renderizarPaginacaoLogs();
+}
+
+function renderizarTabelaLogs() {
+  const tbody = document.getElementById('admin-logs-body');
+  if (adminState.logs.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--cor-texto-secundario);">Nenhum registro.</td></tr>';
+    return;
+  }
+  const acaoIcons = { login:'fa-sign-in-alt', logout:'fa-sign-out-alt', criar:'fa-plus', editar:'fa-edit', excluir:'fa-trash', alterar_senha:'fa-key', visualizar:'fa-eye' };
+  tbody.innerHTML = adminState.logs.map(l => {
+    return '<tr>' +
+      '<td>' + formatarDataHora(l.timestamp) + '</td>' +
+      '<td>' + escapeHtml(l.usuario_nome || '') + '</td>' +
+      '<td><i class="fas ' + (acaoIcons[l.acao]||'fa-circle') + '" style="margin-right:4px;"></i>' + (l.acao||'') + '</td>' +
+      '<td>' + (l.entidade||'') + '</td>' +
+      '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + escapeHtml(l.detalhes||'') + '">' + escapeHtml((l.detalhes||'').substring(0,80)) + '</td>' +
+      '<td style="font-size:11px;color:var(--cor-texto-secundario);">' + (l.ip||'') + '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+function renderizarPaginacaoLogs() {
+  const container = document.getElementById('admin-logs-paginacao');
+  if (adminState.logTotalPaginas <= 1) { container.innerHTML = ''; return; }
+  let html = '<button ' + (adminState.logPagina <= 1 ? 'disabled' : '') + ' onclick="carregarLogs(' + (adminState.logPagina-1) + ')"><i class="fas fa-chevron-left"></i></button>';
+  const inicio = Math.max(1, adminState.logPagina - 2);
+  const fim = Math.min(adminState.logTotalPaginas, adminState.logPagina + 2);
+  for (let i = inicio; i <= fim; i++) {
+    html += '<button class="' + (i === adminState.logPagina ? 'ativa' : '') + '" onclick="carregarLogs(' + i + ')">' + i + '</button>';
+  }
+  html += '<button ' + (adminState.logPagina >= adminState.logTotalPaginas ? 'disabled' : '') + ' onclick="carregarLogs(' + (adminState.logPagina+1) + ')"><i class="fas fa-chevron-right"></i></button>';
+  html += '<span style="margin-left:12px;font-size:12px;color:var(--cor-texto-secundario);">' + adminState.logTotal + ' registros</span>';
+  container.innerHTML = html;
+}
+
+function aplicarFiltrosLog() {
+  carregarLogs(1);
+}
+
+// ═══════ CONFIGURAÇÕES ═══════
+
+async function carregarConfigs() {
+  const resp = await apiPost('config.listar');
+  if (!resp.sucesso) { toast(resp.mensagem, 'erro'); return; }
+  adminState.configs = resp.dados || [];
+  renderizarConfigs();
+}
+
+function renderizarConfigs() {
+  const tbody = document.getElementById('admin-configs-body');
+  if (adminState.configs.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:30px;">Nenhuma configuração.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = adminState.configs.map(c => {
+    return '<tr>' +
+      '<td><code style="background:#f1f5f9;padding:2px 8px;border-radius:4px;font-size:13px;">' + escapeHtml(c.chave) + '</code></td>' +
+      '<td><input type="text" id="config-val-' + escapeHtml(c.chave) + '" value="' + escapeHtml(c.valor||'') + '" style="padding:6px 10px;border:1px solid var(--cor-borda);border-radius:var(--radius);font-size:13px;width:100%;"></td>' +
+      '<td style="font-size:12px;color:var(--cor-texto-secundario);">' + escapeHtml(c.descricao||'') + '</td>' +
+      '<td><button class="btn btn-outline" style="padding:5px 10px;font-size:12px;" onclick="salvarConfig(\'' + escapeHtml(c.chave) + '\')"><i class="fas fa-save"></i></button></td>' +
+    '</tr>';
+  }).join('');
+}
+
+async function salvarConfig(chave) {
+  const input = document.getElementById('config-val-' + chave);
+  if (!input) return;
+  const valor = input.value.trim();
+
+  mostrarLoading();
+  const resp = await apiPost('config.editar', { chave, valor });
+  esconderLoading();
+  if (resp.sucesso) { toast('Configuração "' + chave + '" salva.', 'sucesso'); }
+  else { toast(resp.mensagem, 'erro'); }
+}
+
+    
+// ============================================================
+// PERFIL — Alterar senha, foto e visualizar dados pessoais
+// ============================================================
+
+function inicializarModuloPerfil() {
+  if (!estadoApp.perfil) return;
+  const p = estadoApp.perfil;
+  document.getElementById('perfil-nome').textContent = p.nome || '';
+  document.getElementById('perfil-email').textContent = p.email || '';
+  document.getElementById('perfil-nivel').textContent = p.nivel_acesso || '';
+
+  // Avatar: foto ou iniciais
+  const avatarEl = document.getElementById('perfil-avatar');
+  if (p.foto_url) {
+    avatarEl.innerHTML = '<img src="' + corrigirUrlFotoDrive(p.foto_url) + '" style="width:80px;height:80px;border-radius:50%;object-fit:cover;">';
+    avatarEl.style.background = 'none';
+  } else {
+    const iniciais = (p.nome||'?').split(' ').map(x => x[0]).join('').substring(0,2).toUpperCase();
+    avatarEl.textContent = iniciais;
+    avatarEl.style.background = '';
+  }
+
+  // Preview da foto atual
+  const previewEl = document.getElementById('perfil-foto-preview');
+  if (previewEl) {
+    previewEl.innerHTML = p.foto_url ? '<img src="' + corrigirUrlFotoDrive(p.foto_url) + '" style="width:60px;height:60px;border-radius:50%;object-fit:cover;">' : '<span style="color:var(--cor-texto-secundario);font-size:13px;">Nenhuma foto</span>';
+  }
+
+  // Limpa input de foto
+  const fotoInput = document.getElementById('perfil-foto-input');
+  if (fotoInput) fotoInput.value = '';
+
+  // Limpa formulário de senha
+  document.getElementById('perfil-senha-atual').value = '';
+  document.getElementById('perfil-senha-nova').value = '';
+  document.getElementById('perfil-senha-confirmar').value = '';
+  document.getElementById('perfil-senha-msg').style.display = 'none';
+}
+
+async function alterarSenhaPerfil() {
+  const senhaAtual = document.getElementById('perfil-senha-atual').value;
+  const senhaNova = document.getElementById('perfil-senha-nova').value;
+  const senhaConfirmar = document.getElementById('perfil-senha-confirmar').value;
+  const msgEl = document.getElementById('perfil-senha-msg');
+
+  msgEl.style.display = 'none';
+
+  if (!senhaAtual) { mostrarMsgPerfil('Digite a senha atual.', 'erro'); return; }
+  if (!senhaNova || senhaNova.length < 6) { mostrarMsgPerfil('Nova senha deve ter no mínimo 6 caracteres.', 'erro'); return; }
+  if (senhaNova !== senhaConfirmar) { mostrarMsgPerfil('A confirmação não confere com a nova senha.', 'erro'); return; }
+  if (senhaAtual === senhaNova) { mostrarMsgPerfil('A nova senha deve ser diferente da atual.', 'erro'); return; }
+
+  mostrarLoading();
+  const resp = await apiPost('auth.alterar_senha', { senha_atual: senhaAtual, nova_senha: senhaNova });
+  esconderLoading();
+
+  if (resp.sucesso) {
+    mostrarMsgPerfil('Senha alterada com sucesso!', 'sucesso');
+    document.getElementById('perfil-senha-atual').value = '';
+    document.getElementById('perfil-senha-nova').value = '';
+    document.getElementById('perfil-senha-confirmar').value = '';
+  } else {
+    mostrarMsgPerfil(resp.mensagem || 'Erro ao alterar senha.', 'erro');
+  }
+}
+
+function mostrarMsgPerfil(msg, tipo) {
+  const el = document.getElementById('perfil-senha-msg');
+  el.textContent = msg;
+  el.className = 'alerta alerta-' + tipo;
+  el.style.display = 'block';
+}
+
+async function uploadFotoPerfil() {
+  const fotoInput = document.getElementById('perfil-foto-input');
+  if (!fotoInput || !fotoInput.files.length) {
+    toast('Selecione uma foto primeiro.', 'erro');
+    return;
+  }
+
+  const file = fotoInput.files[0];
+  if (file.size > 5 * 1024 * 1024) {
+    toast('Foto muito grande (máximo 5MB).', 'erro');
+    return;
+  }
+
+  mostrarLoading();
+  try {
+    const base64 = await fileToBase64(file);
+    const respFoto = await apiPost('upload.foto', {
+      nome_arquivo: 'perfil_' + estadoApp.perfil.id,
+      base64: base64,
+      tipo_mime: file.type
+    });
+
+    if (!respFoto.sucesso) {
+      toast(respFoto.mensagem || 'Erro ao enviar foto.', 'erro');
+      esconderLoading();
+      return;
+    }
+
+    // Salva URL no perfil do usuário
+    const respSalvar = await apiPost('auth.atualizar_foto', {
+      foto_url: respFoto.dados.url
+    });
+
+    esconderLoading();
+
+    if (respSalvar.sucesso) {
+      toast('Foto atualizada com sucesso!', 'sucesso');
+      estadoApp.perfil.foto_url = respFoto.dados.url;
+      atualizarSidebar();
+      inicializarModuloPerfil();
+    } else {
+      toast(respSalvar.mensagem || 'Erro ao salvar foto.', 'erro');
+    }
+  } catch(e) {
+    esconderLoading();
+    toast('Erro ao processar foto: ' + e.message, 'erro');
+  }
+}
+
+function removerFotoPerfil() {
+  if (!confirm('Remover sua foto de perfil?')) return;
+
+  apiPost('auth.atualizar_foto', { foto_url: '' }).then(resp => {
+    if (resp.sucesso) {
+      toast('Foto removida.', 'sucesso');
+      estadoApp.perfil.foto_url = '';
+      atualizarSidebar();
+      inicializarModuloPerfil();
+    } else {
+      toast(resp.mensagem, 'erro');
+    }
+  });
+}
+
+    
+// ============================================================
+// ROTEADOR — Sistema de navegação SPA por hash
+// ============================================================
+
+const PAGINAS = ['painel', 'contatos', 'planejador', 'agenda', 'dashboards', 'admin', 'perfil'];
+
+function navegar(pagina) {
+  // Esconde todas as páginas
+  PAGINAS.forEach(p => {
+    const el = document.getElementById('page-' + p);
+    if (el) el.classList.remove('ativa');
+  });
+
+  // Mostra a página solicitada
+  const paginaAtual = document.getElementById('page-' + pagina);
+  if (paginaAtual) {
+    paginaAtual.classList.add('ativa');
+  }
+
+  // Atualiza menu ativo no sidebar
+  document.querySelectorAll('#sidebar nav a').forEach(a => {
+    a.classList.remove('ativo');
+    if (a.getAttribute('data-pagina') === pagina) {
+      a.classList.add('ativo');
+    }
+  });
+
+  // Atualiza hash na URL
+  location.hash = '#' + pagina;
+
+  // Fecha sidebar mobile
+  document.getElementById('sidebar').classList.remove('aberto');
+
+  // Callback ao entrar na página
+  if (pagina === 'painel') carregarPainel();
+  if (pagina === 'contatos') {
+    inicializarModuloContatos();
+    // Controla visibilidade dos botões por permissão
+    const btnNovo = document.getElementById('btn-novo-contato');
+    if (btnNovo) btnNovo.style.display = temPermissao('contatos.criar') ? '' : 'none';
+  }
+  if (pagina === 'planejador') {
+    inicializarModuloPlanejador();
+  }
+  if (pagina === 'agenda') {
+    inicializarModuloAgenda();
+  }
+  if (pagina === 'dashboards') {
+    inicializarModuloDashboards();
+  }
+  if (pagina === 'admin') {
+    inicializarModuloAdmin();
+  }
+  if (pagina === 'perfil') {
+    inicializarModuloPerfil();
+  }
+}
+
+function inicializarRoteador() {
+  // Cliques no menu
+  document.querySelectorAll('#sidebar nav a').forEach(a => {
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      const pagina = this.getAttribute('data-pagina');
+      navegar(pagina);
+    });
+  });
+
+  // Navegação por hash
+  window.addEventListener('hashchange', function() {
+    const hash = location.hash.replace('#', '');
+    if (PAGINAS.includes(hash)) {
+      navegar(hash);
+    }
+  });
+
+  // Toggle sidebar mobile
+  document.getElementById('sidebar-toggle').addEventListener('click', function() {
+    document.getElementById('sidebar').classList.toggle('aberto');
+  });
+}
+
+// ── Inicialização ──
+document.addEventListener('DOMContentLoaded', function() {
+  inicializarRoteador();
+
+  // Enter no formulário de login
+  document.getElementById('login-senha').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') fazerLogin();
+  });
+  document.getElementById('login-email').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') document.getElementById('login-senha').focus();
+  });
+
+  // Verifica sessão existente
+  if (carregarSessao()) {
+    exibirApp();
+  } else {
+    exibirLogin();
+  }
+});
+
+    </script>
+
+</body>
+</html>
